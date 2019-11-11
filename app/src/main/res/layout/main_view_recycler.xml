@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="position"
+            type="Integer" />
+        <variable
+            name="dataViewModel"
+            type="sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel" />
+        <variable
+            name="albumModel"
+            type="sourabhkaushik.com.tech.credtask.model.Album" />
+    </data>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:onClick="@{()->dataViewModel.onDummyListItemClick(position)}"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="@dimen/dimen_190"
+        android:padding="@dimen/dimen_10"
+        android:layout_marginTop="@dimen/dimen_30"
+        android:layout_marginLeft="@dimen/dimen_10"
+        android:layout_marginRight="@dimen/dimen_10"
+        android:layout_marginBottom="@dimen/dimen_10"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/dimen_130"
+            android:text="@{albumModel.song}"
+            android:textSize="@dimen/dimen_20"
+            android:padding="@dimen/dimen_10"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/dimen_160"
+            android:text="@{albumModel.artists}"
+            android:textSize="@dimen/dimen_15"
+            android:padding="@dimen/dimen_10"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content" />
+
+    </androidx.cardview.widget.CardView>
+        <ImageView
+            android:layout_width="@dimen/dimen_170"
+            android:src="@drawable/dummy"
+            android:layout_marginTop="5dp"
+            android:id="@+id/coverImage"
+            android:elevation="@dimen/dimen_15"
+            android:layout_marginLeft="@dimen/dimen_20"
+            android:layout_marginRight="@dimen/dimen_20"
+
+            android:layout_height="@dimen/dimen_150" />
+
+</RelativeLayout>
+</layout>

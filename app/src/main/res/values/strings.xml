@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Cred Task</string>
+    <string name="heath_ledger">Heath Ledger</string>
+    <string name="heath_andrew_ledger_full_txt">Heath Ledger Full Text</string>
+    <string name="welcome">Hello user</string>
+    <string name="welcome_home">Welcome home</string>
+    <string name="stillBufering">Can not stop music while buffering</string>
+    <string name="floating_widget_details">Float Widget titke</string>
+    <string name="dialog_default_title">Here\'s a message!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="LOADING">Loading...</string>
+    <string name="floating_widget_label">Label widget</string>
+</resources>

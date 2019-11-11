@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/cl_root_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/header"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/dimen_20"
+            android:paddingBottom="@dimen/dimen_70">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/curver_corners"
+                    android:maxLength="30"
+                    android:paddingLeft="@dimen/dimen_15"
+                    android:paddingTop="@dimen/dimen_5"
+                    android:paddingBottom="@dimen/dimen_5"
+                    android:text="Search"
+                    android:textColor="@color/bgolor"
+                    android:textSize="@dimen/dimen_15" />
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_50"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/bell" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/dimen_10"
+                android:weightSum="3"
+                app:layout_collapseMode="parallax">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/welcomMsg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/welcome"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dimen_40" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/welcome_home"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dimen_20" />
+
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_100"
+                    android:layout_height="@dimen/dimen_100"
+                    android:layout_weight="2"
+                    android:src="@drawable/user" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackView
+            android:id="@+id/data_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_gravity="center"
+            app:adapter="@{viewModel.adapter}"
+            android:layout_marginTop="@dimen/dimen_180"
+            app:data="@{viewModel.data}"
+            tools:context="com.phunware.example.mvvmrecyclerviewblog.view.MainActivity"
+            tools:listitem="@layout/item_data" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_50"
+            android:layout_below="@id/header"
+            android:orientation="vertical">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/dummyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:dummyAdapter="@{viewModel.dummyAdapter}"
+                app:dummyData="@{viewModel.dummyData}"
+                tools:listitem="@layout/dummy_item_layout" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</layout>

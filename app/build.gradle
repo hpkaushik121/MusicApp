@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        applicationId "sourabhkaushik.com.tech.credtask"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.android.support:recyclerview-v7:29.0.0' // to get RecyclerView
+    implementation 'com.squareup.retrofit2:retrofit:2.6.2' //to hit API
+    implementation "com.squareup.retrofit2:converter-gson:2.6.2"
+    implementation 'com.google.code.gson:gson:2.8.6'  //to convert JSON to model/bean
+    implementation 'com.github.bumptech.glide:glide:4.10.0'//to view image from URL
+    implementation 'com.android.support:cardview-v7:29.0.0'
+    implementation 'com.android.support:design:29.0.0'
+    implementation 'jp.wasabeef:glide-transformations:4.0.0' // to blur the background according to image
+    implementation 'androidx.palette:palette:1.0.0' //to get the palette color from image
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0' // compiler of glide to view image from URL
+
+}

@@ -1,0 +1,51 @@
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/transparent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    <FrameLayout
+        android:id="@+id/putPrefsContentHere"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:src="@drawable/back"
+            android:id="@+id/backBtn"
+            android:padding="@dimen/dimen_10"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_gravity="right"
+
+            android:padding="@dimen/dimen_10"
+            android:layout_height="wrap_content">
+
+            <sourabhkaushik.com.tech.credtask.boommenu.BoomMenuButton
+                android:id="@+id/bmb"
+                app:bmb_shadowEffect="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_5"
+                android:layout_marginRight="@dimen/dimen_5"
+                android:background="@color/transparent"
+                app:bmb_buttonPlaceAlignmentEnum="buttonPlaceAlignment_tr"
+                app:bmb_buttonEnum="ham"
+                app:bmb_buttonPlaceEnum="buttonPlace_ham_2"
+                app:bmb_buttonRadius="@dimen/dimen_15"
+                app:bmb_normalColor="@color/transparent"
+                app:bmb_piecePlaceEnum="piecePlace_ham_2" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>
