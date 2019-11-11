@@ -121,18 +121,21 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
 
             mediaPlayer.pause();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                MediaPlayerService.mediaPlayerService.stopForeground(false);
-            }else {
-                ((NotificationManager) MainApplication.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE)).notify(1,MediaPlayerService.mediaPlayerService.getNotification(
-                        time,
-                        MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle(),
-                        MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
-                        MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
-                        BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
-                                android.R.drawable.ic_media_pause)
-                ));
+            if(!PlayListViewModel.isBuffering){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    MediaPlayerService.mediaPlayerService.stopForeground(false);
+                }else {
+                    ((NotificationManager) MainApplication.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE)).notify(1,MediaPlayerService.mediaPlayerService.getNotification(
+                            time,
+                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle(),
+                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
+                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
+                            BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
+                                    android.R.drawable.ic_media_pause)
+                    ));
+                }
             }
+
 
         }
     }

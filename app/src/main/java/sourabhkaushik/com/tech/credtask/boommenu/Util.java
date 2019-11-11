@@ -61,6 +61,13 @@ public class Util {
         return Math.round(px);
     }
 
+    public  static boolean hasJellyBean() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+
+    public static boolean hasLollipop() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    }
     public static int getColor(View view, int id, Resources.Theme theme) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return view.getResources().getColor(id, theme);

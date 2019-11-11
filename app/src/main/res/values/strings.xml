@@ -11,4 +11,5 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="LOADING">Loading...</string>
     <string name="floating_widget_label">Label widget</string>
+    <string name="lorem_ipsum">lorem ipsum</string>
 </resources>

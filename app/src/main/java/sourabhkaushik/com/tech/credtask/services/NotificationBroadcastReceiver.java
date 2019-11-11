@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
+import sourabhkaushik.com.tech.credtask.view.MainActivity;
 import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
 import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
 
@@ -56,7 +57,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                 }
                 if (intent.getAction().equalsIgnoreCase("nextSong")) {
 
-                    if (PlayMusicActivity.isInForground) {
+                    if (PlayMusicActivity.isInForground|| MainActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().nextMusic();
                     } else {
                         int position = Integer.parseInt(intent.getStringExtra("positionSong"));
@@ -78,7 +79,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
                 }
                 if (intent.getAction().equalsIgnoreCase("prevSong")) {
-                    if (PlayMusicActivity.isInForground) {
+                    if (PlayMusicActivity.isInForground||MainActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().prevMusic();
                     } else {
                         int position = Integer.parseInt(intent.getStringExtra("positionSong"));

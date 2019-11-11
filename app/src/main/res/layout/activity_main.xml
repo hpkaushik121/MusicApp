@@ -18,9 +18,9 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/header"
             android:background="@color/colorPrimary"
             android:orientation="vertical"
             android:paddingTop="@dimen/dimen_20"
@@ -88,6 +88,7 @@
                 <ImageView
                     android:layout_width="@dimen/dimen_100"
                     android:layout_height="@dimen/dimen_100"
+                    android:id="@+id/musicImage"
                     android:layout_weight="2"
                     android:src="@drawable/user" />
             </LinearLayout>
@@ -100,8 +101,8 @@
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:layout_gravity="center"
-            app:adapter="@{viewModel.adapter}"
             android:layout_marginTop="@dimen/dimen_180"
+            app:adapter="@{viewModel.adapter}"
             app:data="@{viewModel.data}"
             tools:context="com.phunware.example.mvvmrecyclerviewblog.view.MainActivity"
             tools:listitem="@layout/item_data" />
@@ -109,8 +110,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_50"
             android:layout_below="@id/header"
+            android:layout_marginTop="@dimen/dimen_50"
             android:orientation="vertical">
 
 
@@ -123,6 +124,18 @@
                 tools:listitem="@layout/dummy_item_layout" />
 
         </LinearLayout>
+
+
+        <!--<sourabhkaushik.com.tech.credtask.customRecyclerViews.MoveableLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:moveable_headerImage="@drawable/user"-->
+            <!--android:id="@+id/moveable">-->
+            <!--&lt;!&ndash;<ImageView&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_width="@dimen/dimen_100"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:src="@drawable/user"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_height="@dimen/dimen_100" />&ndash;&gt;-->
+        <!--</sourabhkaushik.com.tech.credtask.customRecyclerViews.MoveableLayout>-->
 
 
     </RelativeLayout>

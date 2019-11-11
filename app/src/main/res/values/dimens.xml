@@ -35,7 +35,9 @@
     <dimen name="title_top_margin_collapsed">64dp</dimen>
     <dimen name="subtitle_left_margin_collapsed">72dp</dimen>
     <dimen name="subtitle_top_margin_collapsed">88dp</dimen>
-
+    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_size_mini">40dp</dimen>
+    <dimen name="labels_text_size">14sp</dimen>
 
     <dimen name="default_collapsed_padding">120dp</dimen>
     <dimen name="default_expanded_padding">0dp</dimen>
@@ -60,4 +62,5 @@
     <dimen name="dimen_22">22dp</dimen>
     <dimen name="dimen_70">70dp</dimen>
     <dimen name="dimen_210">210dp</dimen>
+    <dimen name="dimen_60">60dp</dimen>
 </resources>

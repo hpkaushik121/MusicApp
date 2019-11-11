@@ -457,4 +457,9 @@
         <attr name="bmb_bottomHamButtonTopMargin" format="dimension|reference"/>
 
     </declare-styleable>
+
+
+    <declare-styleable name="MoveableLayout">
+        <attr name="moveable_headerImage" format="integer"/>
+    </declare-styleable>
 </resources>

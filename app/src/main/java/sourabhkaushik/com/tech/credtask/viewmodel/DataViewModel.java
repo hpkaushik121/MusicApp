@@ -75,41 +75,10 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     public List<DataModel> data;
     private List<Album> dummyData;
     private View view;
-    private ImageView userImage;
-    private Toolbar toolbar;
-    private AppBarLayout appBarLayout;
     private RequestListener listener;
     private Activity activity;
-    private boolean isCalculated = false;
     private CardStackLayoutManager manager;
     private CardStackView recyclerView;
-    private static final String TAG = "CollapsingImageLayout";
-
-    private WindowInsetsCompat mLastInsets;
-
-    private int mImageLeftExpanded;
-
-    private int mImageTopExpanded;
-
-    private int mTitleLeftExpanded;
-
-    private int mTitleTopExpanded;
-
-    private int mSubtitleLeftExpanded;
-
-    private int mSubtitleTopExpanded;
-
-    private int mImageLeftCollapsed;
-
-    private int mImageTopCollapsed;
-
-    private int mTitleLeftCollapsed;
-
-    private int mTitleTopCollapsed;
-
-    private int mSubtitleLeftCollapsed;
-
-    private int mSubtitleTopCollapsed;
 
     public DataViewModel(View view, Activity act) {
         data = new ArrayList<>();
@@ -150,6 +119,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
         dummyRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setLayoutManager(manager);
+
 
 
     }
@@ -198,9 +168,25 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
                             Album album = new Album();
                             album.setType("Popular");
                             album.setAlbum(itemsList);
+
                             albums.add(album);
+                            album = new Album();
                             album.setType("New Songs");
+                            album.setAlbum(itemsList);
                             albums.add(album);
+                            album = new Album();
+                            album.setType("New Songs");
+                            album.setAlbum(itemsList);
+                            albums.add(album);
+                            album = new Album();
+                            album.setType("New Songs");
+                            album.setAlbum(itemsList);
+                            albums.add(album);
+                            album = new Album();
+                            album.setType("New Songs");
+                            album.setAlbum(itemsList);
+                            albums.add(album);
+
                             albumListModel.setAlbums(albums);
 
 
