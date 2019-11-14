@@ -1,25 +1,17 @@
 package sourabhkaushik.com.tech.credtask.view;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import sourabhkaushik.com.tech.credtask.R;
-import sourabhkaushik.com.tech.credtask.customRecyclerViews.DialogProgress;
 import sourabhkaushik.com.tech.credtask.databinding.ActivityPlayMusicBinding;
-import sourabhkaushik.com.tech.credtask.interfaces.RequestListener;
-import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
 import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
 
 public class PlayMusicActivity extends AppCompatActivity  {
@@ -30,7 +22,7 @@ public class PlayMusicActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding= DataBindingUtil.setContentView(this,R.layout.activity_play_music);
+        binding= DataBindingUtil.setContentView(this,R.layout.play_list_layout);
 
         binding.setPlayListViewModel(new PlayListViewModel(this));
         binding.getPlayListViewModel().setBoomButton();

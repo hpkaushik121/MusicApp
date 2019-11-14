@@ -58,7 +58,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return data==null?0:data.size();
     }
 
     public void updateData(List<DataModel> model){
