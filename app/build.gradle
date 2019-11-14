@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.10.0'//to view image from URL
     implementation 'com.android.support:cardview-v7:29.0.0'
     implementation 'com.android.support:design:29.0.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
     implementation 'jp.wasabeef:glide-transformations:4.0.0' // to blur the background according to image
     implementation 'androidx.palette:palette:1.0.0' //to get the palette color from image
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0' // compiler of glide to view image from URL

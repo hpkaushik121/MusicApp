@@ -23,8 +23,9 @@
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:orientation="vertical"
+            android:paddingLeft="@dimen/dimen_10"
             android:paddingTop="@dimen/dimen_20"
-            android:paddingBottom="@dimen/dimen_70">
+            android:paddingRight="@dimen/dimen_10">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -48,95 +49,107 @@
                 <ImageView
                     android:layout_width="@dimen/dimen_50"
                     android:layout_height="wrap_content"
+
                     android:layout_marginTop="-20dp"
                     android:layout_weight="1"
                     android:src="@drawable/bell" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/dimen_10"
-                android:weightSum="3"
-                app:layout_collapseMode="parallax">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/welcomMsg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/welcome"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dimen_40" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/welcome_home"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dimen_20" />
-
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="@dimen/dimen_100"
-                    android:layout_height="@dimen/dimen_100"
-                    android:id="@+id/musicImage"
-                    android:layout_weight="2"
-                    android:src="@drawable/user" />
-            </LinearLayout>
 
         </LinearLayout>
-
-
-        <sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackView
-            android:id="@+id/data_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dimen_180"
-            app:adapter="@{viewModel.adapter}"
-            app:data="@{viewModel.data}"
-            tools:context="com.phunware.example.mvvmrecyclerviewblog.view.MainActivity"
-            tools:listitem="@layout/item_data" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/header"
-            android:layout_marginTop="@dimen/dimen_50"
-            android:orientation="vertical">
+            android:layout_below="@id/header">
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/dummyRecyclerView"
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:dummyAdapter="@{viewModel.dummyAdapter}"
-                app:dummyData="@{viewModel.dummyData}"
-                tools:listitem="@layout/dummy_item_layout" />
+                android:layout_height="wrap_content">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorPrimary"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/dimen_10"
+                            android:paddingBottom="@dimen/dimen_70"
+                            android:weightSum="3"
+                            app:layout_collapseMode="parallax">
+
+                            <LinearLayout
+                                android:id="@+id/textDetails"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/welcomMsg"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/welcome"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/dimen_40" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/welcome_home"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/dimen_20" />
+
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/musicImage"
+                                android:layout_width="@dimen/dimen_100"
+                                android:layout_height="@dimen/dimen_100"
+                                android:layout_alignParentRight="true"
+                                android:layout_gravity="right"
+                                android:layout_weight="2"
+                                android:src="@drawable/user" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/dimen_70"
+                                android:layout_below="@id/musicImage"
+                                android:background="@color/colorPrimary" />
+                        </RelativeLayout>
+
+                        <sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackView
+                            android:id="@+id/data_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="140dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/dimen_110"
+                            app:adapter="@{viewModel.adapter}"
+                            app:data="@{viewModel.data}"
+                            tools:context="com.phunware.example.mvvmrecyclerviewblog.view.MainActivity"
+                            tools:listitem="@layout/item_data" />
+
+                    </RelativeLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/dummyRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:dummyAdapter="@{viewModel.dummyAdapter}"
+                        app:dummyData="@{viewModel.dummyData}"
+                        tools:listitem="@layout/dummy_item_layout" />
+
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
         </LinearLayout>
-
-
-        <!--<sourabhkaushik.com.tech.credtask.customRecyclerViews.MoveableLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--app:moveable_headerImage="@drawable/user"-->
-            <!--android:id="@+id/moveable">-->
-            <!--&lt;!&ndash;<ImageView&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_width="@dimen/dimen_100"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:src="@drawable/user"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="@dimen/dimen_100" />&ndash;&gt;-->
-        <!--</sourabhkaushik.com.tech.credtask.customRecyclerViews.MoveableLayout>-->
-
-
     </RelativeLayout>
 </layout>

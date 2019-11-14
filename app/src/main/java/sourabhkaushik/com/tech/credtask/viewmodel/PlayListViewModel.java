@@ -7,6 +7,10 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -26,6 +30,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.R;
@@ -77,7 +82,7 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
     public void init(final ActivityPlayMusicBinding binding) {
         layoutManager = new CarouselLayoutManager(CarouselLayoutManager.HORIZONTAL, false);
         layoutManager.setPostLayoutListener(new CarouselZoomPostLayoutListener());
-        ImageView imageView = activity.findViewById(R.id.backBtn);
+        final ImageView imageView = activity.findViewById(R.id.backBtn);
         MediaPlayerInterfaceInstance.getInstance().setMpinterface(this);
         imageView.setOnClickListener(this);
         layoutManager.addOnItemSelectionListener(this);
@@ -125,6 +130,42 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
 
         }
 
+        activityMainBinding.songName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                CircleImageView imageView1=activity.findViewById(R.id.topImage);
+                int[] locationImage = new int[2];
+                int[] locationtext = new int[2];
+                imageView1.getLocationOnScreen(locationImage);
+                activityMainBinding.songName.getLocationOnScreen(locationtext);
+                int centerY= (int) (imageView1.getY()+imageView1.getHeight()/2);
+                Animation animMove=fromAtoB(locationtext[0],
+                       locationtext[1],
+                        locationImage[0],
+                        locationImage[1], new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        },1000);
+
+                Animation animScale=scaleView(activityMainBinding.songName,
+                        activityMainBinding.songName.getScaleX(),imageView1.getScaleX());
+                activityMainBinding.songName.startAnimation(animMove);
+//                activityMainBinding.songName.startAnimation(animScale);
+            }
+        });
 
     }
 
@@ -312,7 +353,40 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
         );
 
     }
+    public Animation fromAtoB(float fromX, float fromY, float toX, float toY, Animation.AnimationListener l, int speed){
 
+
+        Animation fromAtoB = new TranslateAnimation(
+                Animation.ABSOLUTE,
+                fromX,
+                Animation.ABSOLUTE,
+                toX,
+                Animation.ABSOLUTE, //to xType
+                fromY,
+                Animation.ABSOLUTE, //to yType
+                toY
+        );
+
+        fromAtoB.setDuration(speed);
+        fromAtoB.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+
+
+        if(l != null)
+            fromAtoB.setAnimationListener(l);
+        return fromAtoB;
+    }
+
+
+    public Animation scaleView(View v, float startScale, float endScale) {
+        Animation anim = new ScaleAnimation(
+                1f, 1f, // Start and end values for the X axis scaling
+                startScale, endScale, // Start and end values for the Y axis scaling
+                Animation.RELATIVE_TO_SELF, 0f, // Pivot point of X scaling
+                Animation.RELATIVE_TO_SELF, 1f); // Pivot point of Y scaling
+        anim.setFillAfter(true); // Needed to keep the result of the animation
+        anim.setDuration(1000);
+       return anim;
+    }
     private void setUiStopped() {
         isPlaying = false;
         activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.play_btn));

@@ -24,9 +24,11 @@ package sourabhkaushik.com.tech.credtask.viewmodel;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.WindowInsetsCompat;
@@ -55,6 +57,7 @@ import sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackListener;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackView;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.Direction;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.Duration;
+import sourabhkaushik.com.tech.credtask.customRecyclerViews.ResizeWidthAnimation;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.StackFrom;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.SwipeAnimationSetting;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.SwipeableMethod;
@@ -273,6 +276,12 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
             MediaPlayerService.albumList = data;
             view.getContext().startActivity(intent);
         }
+    }
+
+    public void onImageClick(View view){
+//        ResizeWidthAnimation anim = new ResizeWidthAnimation(view, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//        anim.setDuration(10000);
+//        view.startAnimation(anim);
     }
 
 
