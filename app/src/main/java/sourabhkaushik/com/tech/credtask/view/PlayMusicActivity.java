@@ -22,7 +22,7 @@ public class PlayMusicActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding= DataBindingUtil.setContentView(this,R.layout.play_list_layout);
+        binding= DataBindingUtil.setContentView(this,R.layout.activity_play_music);
 
         binding.setPlayListViewModel(new PlayListViewModel(this));
         binding.getPlayListViewModel().setBoomButton();

@@ -1,14 +1,18 @@
 package sourabhkaushik.com.tech.credtask.viewmodel;
 
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
@@ -134,39 +138,33 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
             @Override
             public void onClick(View view) {
 
-                CircleImageView imageView1=activity.findViewById(R.id.topImage);
-                int[] locationImage = new int[2];
-                int[] locationtext = new int[2];
-                imageView1.getLocationOnScreen(locationImage);
-                activityMainBinding.songName.getLocationOnScreen(locationtext);
-                int centerY= (int) (imageView1.getY()+imageView1.getHeight()/2);
-                Animation animMove=fromAtoB(locationtext[0],
-                       locationtext[1],
-                        locationImage[0],
-                        locationImage[1], new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
+                moveViewToScreenCenter(view);
 
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        },1000);
-
-                Animation animScale=scaleView(activityMainBinding.songName,
-                        activityMainBinding.songName.getScaleX(),imageView1.getScaleX());
-                activityMainBinding.songName.startAnimation(animMove);
-//                activityMainBinding.songName.startAnimation(animScale);
             }
         });
 
+    }
+
+    private void moveViewToScreenCenter( final View view ){
+        DisplayMetrics dm = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics( dm );
+
+        int originalPos[] = new int[2];
+        view.getLocationOnScreen( originalPos );
+
+        int xDelta = (dm.widthPixels - view.getMeasuredWidth() - originalPos[0])/2;
+        int yDelta = (dm.heightPixels - view.getMeasuredHeight() - originalPos[1])/2;
+
+        AnimationSet animSet = new AnimationSet(true);
+        animSet.setFillAfter(true);
+        animSet.setDuration(1000);
+        animSet.setInterpolator(new BounceInterpolator());
+        TranslateAnimation translate = new TranslateAnimation( 0, xDelta , 0, yDelta);
+        animSet.addAnimation(translate);
+        ScaleAnimation scale = new ScaleAnimation(1f, 2f, 1f, 2f, ScaleAnimation.RELATIVE_TO_PARENT, .5f, ScaleAnimation.RELATIVE_TO_PARENT, .5f);
+        animSet.addAnimation(scale);
+        AnimatorSet animatorSet=new AnimatorSet();
+        view.startAnimation(animSet);
     }
 
 
