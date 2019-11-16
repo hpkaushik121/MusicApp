@@ -12,7 +12,7 @@ import android.view.animation.AnimationUtils;
 
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.databinding.ActivityPlayMusicBinding;
-import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
+import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 public class PlayMusicActivity extends AppCompatActivity  {
 
@@ -24,9 +24,9 @@ public class PlayMusicActivity extends AppCompatActivity  {
 
         binding= DataBindingUtil.setContentView(this,R.layout.activity_play_music);
 
-        binding.setPlayListViewModel(new PlayListViewModel(this));
-        binding.getPlayListViewModel().setBoomButton();
-        binding.getPlayListViewModel().init(binding);
+        binding.setPlayMusicViewModel(new PlayMusicViewModel(this));
+        binding.getPlayMusicViewModel().setBoomButton();
+        binding.getPlayMusicViewModel().init(binding);
 
         Animation animbounce = AnimationUtils.loadAnimation(getApplicationContext(),
                 R.anim.bounce_interpolator);

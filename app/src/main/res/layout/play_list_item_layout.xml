@@ -6,8 +6,8 @@
             name="position"
             type="Integer" />
         <variable
-            name="playListViewModel"
-            type="sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel" />
+            name="playMusicViewModel"
+            type="sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel" />
         <variable
             name="dataModel"
             type="sourabhkaushik.com.tech.credtask.model.DataModel" />

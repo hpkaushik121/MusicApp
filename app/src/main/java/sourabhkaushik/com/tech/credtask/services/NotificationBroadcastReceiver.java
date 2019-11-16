@@ -9,7 +9,7 @@ import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
 import sourabhkaushik.com.tech.credtask.view.MainActivity;
 import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
-import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
+import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 /**
  * Created by Sourabh kaushik on 11/7/2019.
@@ -24,7 +24,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             if (intent != null && intent.getAction() != null) {
                 if (intent.getAction().equalsIgnoreCase("pauseSong")) {
 
-                    if (PlayListViewModel.isBuffering) {
+                    if (PlayMusicViewModel.isBuffering) {
                         AppUtils.showToast("buffering is in progress");
                         return;
                     }

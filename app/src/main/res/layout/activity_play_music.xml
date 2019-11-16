@@ -4,8 +4,8 @@
     <data>
 
         <variable
-            name="playListViewModel"
-            type="sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel" />
+            name="playMusicViewModel"
+            type="sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel" />
     </data>
 
     <RelativeLayout
@@ -46,8 +46,8 @@
                     android:layout_height="300dp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:playListAdapter="@{playListViewModel.playListAdapter}"
-                    app:playListData="@{playListViewModel.dataModels}"
+                    app:playListAdapter="@{playMusicViewModel.playListAdapter}"
+                    app:playListData="@{playMusicViewModel.dataModels}"
                     tools:listitem="@layout/play_list_item_layout" />
 
                 <LinearLayout
@@ -180,5 +180,10 @@
 
 
         </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:id="@+id/playListFragment"
+            android:layout_height="match_parent"/>
     </RelativeLayout>
 </layout>

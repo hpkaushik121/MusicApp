@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.Bindable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,9 +20,7 @@ import java.util.List;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.databinding.PlayListItemLayoutBinding;
 import sourabhkaushik.com.tech.credtask.model.DataModel;
-import sourabhkaushik.com.tech.credtask.viewmodel.DataItemViewModel;
-import sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel;
-import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
+import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 /**
  * Created by Sourabh kaushik on 11/5/2019.
@@ -31,11 +28,11 @@ import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayListAdapterViewHolder>{
 
     private List<DataModel> data;
-    private PlayListViewModel playListViewModel;
+    private PlayMusicViewModel playMusicViewModel;
     private Context context;
 
-    public PlayListAdapter(PlayListViewModel playListViewModel) {
-        this.playListViewModel = playListViewModel;
+    public PlayListAdapter(PlayMusicViewModel playMusicViewModel) {
+        this.playMusicViewModel = playMusicViewModel;
         data=new ArrayList<>();
     }
 
@@ -85,7 +82,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
         public void bind(DataModel model,Integer position){
             binding.setDataModel(model);
-            binding.setPlayListViewModel(playListViewModel);
+            binding.setPlayMusicViewModel(playMusicViewModel);
             binding.setPosition(position);
         }
     }

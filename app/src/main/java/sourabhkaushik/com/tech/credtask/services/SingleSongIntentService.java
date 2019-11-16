@@ -12,8 +12,7 @@ import android.util.Log;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
-import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
-import sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel;
+import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 /**
  * Created by Sourabh kaushik on 11/6/2019.
@@ -121,7 +120,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
 
             mediaPlayer.pause();
-            if(!PlayListViewModel.isBuffering){
+            if(!PlayMusicViewModel.isBuffering){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     MediaPlayerService.mediaPlayerService.stopForeground(false);
                 }else {

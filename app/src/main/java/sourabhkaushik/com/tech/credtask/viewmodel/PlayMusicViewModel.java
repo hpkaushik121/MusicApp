@@ -19,22 +19,15 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.databinding.library.baseAdapters.BR;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.R;
@@ -48,27 +41,24 @@ import sourabhkaushik.com.tech.credtask.customRecyclerViews.carousellayoutmanage
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.carousellayoutmanager.CarouselZoomPostLayoutListener;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.carousellayoutmanager.CenterScrollListener;
 import sourabhkaushik.com.tech.credtask.databinding.ActivityPlayMusicBinding;
+import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterface;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
-import sourabhkaushik.com.tech.credtask.interfaces.RequestListener;
 import sourabhkaushik.com.tech.credtask.model.DataModel;
-import sourabhkaushik.com.tech.credtask.model.SongItemModel;
-import sourabhkaushik.com.tech.credtask.network.ApiRequest;
 import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
 import sourabhkaushik.com.tech.credtask.services.SingleSongIntentService;
-import sourabhkaushik.com.tech.credtask.view.MainActivity;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 /**
  * Created by Sourabh kaushik on 11/5/2019.
  */
-public class PlayListViewModel extends BaseObservable implements MediaPlayerInterface,
+public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInterface,
         SeekBar.OnSeekBarChangeListener, View.OnClickListener, CarouselLayoutManager.OnCenterItemSelectionListener {
 
     private List<DataModel> dataModels;
     private PlayListAdapter playListAdapter;
-    private Activity activity;
+    public AppCompatActivity activity;
     private CarouselLayoutManager layoutManager;
     private int totalSongLength = 0;
     private int songPlayedSeconds = 0;
@@ -77,7 +67,7 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
     public static boolean isBuffering = false;
     private ActivityPlayMusicBinding activityMainBinding;
 
-    public PlayListViewModel(Activity activity) {
+    public PlayMusicViewModel(AppCompatActivity activity) {
         dataModels = MediaPlayerService.albumList;
         this.activity = activity;
         playListAdapter = new PlayListAdapter(this);
@@ -112,7 +102,7 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
             final int position = activity.getIntent().getIntExtra("position", 0);
             layoutManager.scrollToPosition(position);
             MediaPlayerService.positionToplay = position;
-            MediaPlayerInterfaceInstance.getInstance().setMpinterface(PlayListViewModel.this);
+            MediaPlayerInterfaceInstance.getInstance().setMpinterface(PlayMusicViewModel.this);
             MediaPlayerService.albumList = dataModels;
             if (!activity.getIntent().hasExtra("intent")) {
                 ntIntent = false;
@@ -138,34 +128,17 @@ public class PlayListViewModel extends BaseObservable implements MediaPlayerInte
             @Override
             public void onClick(View view) {
 
-                moveViewToScreenCenter(view);
+                FragmentManager fragmentManager=activity.getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .add(R.id.playListFragment,new PlayListFragment(PlayMusicViewModel.this))
+                        .commit();
+
 
             }
         });
 
     }
 
-    private void moveViewToScreenCenter( final View view ){
-        DisplayMetrics dm = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics( dm );
-
-        int originalPos[] = new int[2];
-        view.getLocationOnScreen( originalPos );
-
-        int xDelta = (dm.widthPixels - view.getMeasuredWidth() - originalPos[0])/2;
-        int yDelta = (dm.heightPixels - view.getMeasuredHeight() - originalPos[1])/2;
-
-        AnimationSet animSet = new AnimationSet(true);
-        animSet.setFillAfter(true);
-        animSet.setDuration(1000);
-        animSet.setInterpolator(new BounceInterpolator());
-        TranslateAnimation translate = new TranslateAnimation( 0, xDelta , 0, yDelta);
-        animSet.addAnimation(translate);
-        ScaleAnimation scale = new ScaleAnimation(1f, 2f, 1f, 2f, ScaleAnimation.RELATIVE_TO_PARENT, .5f, ScaleAnimation.RELATIVE_TO_PARENT, .5f);
-        animSet.addAnimation(scale);
-        AnimatorSet animatorSet=new AnimatorSet();
-        view.startAnimation(animSet);
-    }
 
 
     @Bindable
