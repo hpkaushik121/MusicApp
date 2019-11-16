@@ -23,7 +23,7 @@ public class PlayListFragment extends Fragment {
 
     private PlayMusicViewModel playMusicViewModel;
     private PlayListViewModel playListViewModel;
-    private PlayListLayoutBinding binding;
+    public PlayListLayoutBinding binding;
 
 
     public PlayListFragment(PlayMusicViewModel playMusicViewModel) {
@@ -35,7 +35,7 @@ public class PlayListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding= DataBindingUtil.inflate(inflater, R.layout.play_list_layout,container,false);
         binding.setPlayMusicViewModel(playMusicViewModel);
-        binding.setPlayListViewModel(new PlayListViewModel(getActivity().getApplication()));
+        binding.setPlayListViewModel(new PlayListViewModel(getActivity().getApplication(),this));
         binding.getPlayListViewModel().init(binding);
         return binding.getRoot();
     }

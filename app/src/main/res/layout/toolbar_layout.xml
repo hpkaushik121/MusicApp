@@ -23,16 +23,9 @@
             android:id="@+id/backBtn"
             android:padding="@dimen/dimen_10"
             android:layout_height="wrap_content" />
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="@dimen/dimen_40"
-            android:src="@drawable/dummy"
-            android:layout_gravity="center"
-            android:id="@+id/topImage"
-            android:layout_height="@dimen/dimen_40" />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_gravity="right"
-
             android:padding="@dimen/dimen_10"
             android:layout_height="wrap_content">
 

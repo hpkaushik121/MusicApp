@@ -2,16 +2,20 @@ package sourabhkaushik.com.tech.credtask.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.databinding.ActivityPlayMusicBinding;
+import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
 import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 public class PlayMusicActivity extends AppCompatActivity  {
@@ -68,14 +72,33 @@ public class PlayMusicActivity extends AppCompatActivity  {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if(getIntent().hasExtra("intent")){
-            Intent intent=new Intent(this,MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-            |Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+
+        FragmentManager manager=getSupportFragmentManager();
+        Fragment fragment=manager.findFragmentByTag("playList");
+        if(fragment!=null){
+            try{
+                PlayListFragment playListFragment= (PlayListFragment) fragment;
+                playListFragment.binding.getPlayListViewModel().onSwipDown(400);
+            }catch (Exception e){
+                if(e.getMessage() !=null)
+                    Log.e("error", e.getMessage());
+                else
+                    e.printStackTrace();
+                manager.beginTransaction().remove(fragment).commit();
+            }
+            return;
+        }else{
+            if(getIntent().hasExtra("intent")){
+                Intent intent=new Intent(this,MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        |Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return;
+            }
         }
+
+        super.onBackPressed();
     }
 
 }

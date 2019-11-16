@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -16,10 +19,13 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 import androidx.fragment.app.FragmentManager;
@@ -61,6 +67,12 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
     public AppCompatActivity activity;
     private CarouselLayoutManager layoutManager;
     private int totalSongLength = 0;
+    private int _xDelta;
+    private int _yDelta;
+    private int Y=0;
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
     private int songPlayedSeconds = 0;
     private boolean ntIntent = false;
     private boolean isPlaying = true;
@@ -124,21 +136,64 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
         }
 
-        activityMainBinding.songName.setOnClickListener(new View.OnClickListener() {
+        final GestureDetectorCompat gestureDetector=new GestureDetectorCompat(activity, new GestureDetector.SimpleOnGestureListener(){
+
             @Override
-            public void onClick(View view) {
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                float angle = (float) Math.toDegrees(Math.atan2(e1.getY() - e2.getY(), e2.getX() - e1.getX()));
+                if (angle > 45 && angle <= 135) {
+                    Log.d("DEBUG_TAG", "Down to Up swipe performed");
+                    onSwipUP();
+                    return true;
+                }
+                return false;
+            }
+        });
+        activityMainBinding.dragTop.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
 
-                FragmentManager fragmentManager=activity.getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .add(R.id.playListFragment,new PlayListFragment(PlayMusicViewModel.this))
-                        .commit();
-
-
+                final int Y = (int) event.getRawY();
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        LinearLayout.LayoutParams lParams = (LinearLayout.LayoutParams) view.getLayoutParams();
+                        _yDelta = Y - lParams.topMargin;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) view.getLayoutParams();
+                        layoutParams.topMargin = 0;
+                        int Yaxis=Y-_yDelta;
+                        if(Yaxis<-300){
+                            onSwipUP();
+                        }
+                        view.setLayoutParams(layoutParams);
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        LinearLayout.LayoutParams layoutPara= (LinearLayout.LayoutParams) view.getLayoutParams();
+                        layoutPara.topMargin = Y - _yDelta;
+                        view.setLayoutParams(layoutPara);
+                        break;
+                }
+                binding.getRoot().invalidate();
+                 return true;
             }
         });
 
+
     }
 
+    private void onSwipUP() {
+        activityMainBinding.playListFragment.setVisibility(View.VISIBLE);
+        activityMainBinding.playListFragment.bringToFront();
+        FragmentManager fragmentManager=activity.getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.playListFragment,new PlayListFragment(PlayMusicViewModel.this),"playList")
+                .commit();
+    }
 
 
     @Bindable
