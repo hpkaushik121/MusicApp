@@ -21,11 +21,15 @@
  */
 package sourabhkaushik.com.tech.credtask.viewmodel;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -41,6 +45,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -49,6 +54,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import sourabhkaushik.com.tech.credtask.BR;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.adapter.DataAdapter;
@@ -63,12 +69,15 @@ import sourabhkaushik.com.tech.credtask.customRecyclerViews.ResizeWidthAnimation
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.StackFrom;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.SwipeAnimationSetting;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.SwipeableMethod;
+import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterface;
+import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
 import sourabhkaushik.com.tech.credtask.interfaces.RequestListener;
 import sourabhkaushik.com.tech.credtask.model.Album;
 import sourabhkaushik.com.tech.credtask.model.AlbumListModel;
 import sourabhkaushik.com.tech.credtask.model.DataModel;
 import sourabhkaushik.com.tech.credtask.network.ApiRequest;
 import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
+import sourabhkaushik.com.tech.credtask.services.SingleSongIntentService;
 import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
 
 /**
@@ -80,8 +89,11 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     public List<DataModel> data;
     private List<Album> dummyData;
     private View view;
+    private int currentSongPosition=-1;
     private RequestListener listener;
     private Activity activity;
+    private   Handler handler=new Handler();
+    private  ObjectAnimator objectAnimator;
     private CardStackLayoutManager manager;
     private CardStackView recyclerView;
 
@@ -99,6 +111,13 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     private void initRecyclerView(View view) {
         this.view = view;
+        CircleImageView imageView=activity.findViewById(R.id.musicImage);
+        objectAnimator = ObjectAnimator.ofFloat(imageView, View.ROTATION,
+                0.0f, 360.0f);
+
+        objectAnimator.setDuration(4000);
+        objectAnimator.setRepeatCount(Animation.INFINITE);
+        objectAnimator.setInterpolator(new LinearInterpolator());
         manager = new CardStackLayoutManager(view.getContext(), this);
         manager.setStackFrom(StackFrom.Top);
         manager.setVisibleCount(3);
@@ -155,6 +174,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     private void populateData() {
         // populate the data from the source, such as the database.
         listener.onStarted();
+
         LiveData<String> response = ApiRequest.getMusicList();
         if (response != null) {
             response.observe((LifecycleOwner) activity, new Observer<String>() {
@@ -257,6 +277,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     }
 
     public void onItemClick(Integer position) {
+
         if (view != null) {
             Intent intent = new Intent(view.getContext(), PlayMusicActivity.class);
             intent.putExtra("position", position);
@@ -292,11 +313,57 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
         }
     }
 
-    public void onImageClick(View view){
-//        ResizeWidthAnimation anim = new ResizeWidthAnimation(view, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//        anim.setDuration(10000);
-//        view.startAnimation(anim);
+    public void onControllerClick(View view) {
+        Intent resultIntent = new Intent(activity, PlayMusicActivity.class);
+        resultIntent.putExtra("intent", true);
+        resultIntent.putExtra("position", MediaPlayerService.positionToplay);
+        resultIntent.putExtra("songLength", SingleSongIntentService.getInstance().songLength);
+        resultIntent.putExtra("songPlayed", SingleSongIntentService.getInstance().time);
+        resultIntent.putExtra("title", MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle());
+        resultIntent.putExtra("description", MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription());
+        activity.startActivity(resultIntent);
+    }
+    private void setImage(final int pos) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CircleImageView imageView=activity.findViewById(R.id.musicImage);
+                if (SingleSongIntentService.getInstance().getMediaPlayer() != null
+                        && SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()&&!objectAnimator.isRunning()) {
+
+                    objectAnimator.start();
+                }else if(SingleSongIntentService.getInstance().getMediaPlayer() != null
+                        && !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()&&objectAnimator.isRunning()){
+                    objectAnimator.cancel();
+                }
+
+
+                if(currentSongPosition!=pos){
+                    Glide.with(activity).load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()).into(imageView);
+                    currentSongPosition=pos;
+                }
+            }
+        });
+
     }
 
 
+    public void setHandler() {
+      Runnable runnable=new Runnable() {
+          @Override
+          public void run() {
+              try
+              {
+                      setImage(MediaPlayerService.positionToplay);
+
+              }catch (Exception e){
+
+              }finally {
+                  handler.postDelayed(this,1000);
+              }
+
+          }
+      };
+       handler.post(runnable);
+    }
 }

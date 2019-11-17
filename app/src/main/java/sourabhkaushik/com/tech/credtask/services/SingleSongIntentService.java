@@ -12,6 +12,7 @@ import android.util.Log;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
+import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
 import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 /**
@@ -27,8 +28,8 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     private Handler handler;
     private boolean isHandlerAttached = false;
     private MediaPlayer mediaPlayer;
-    int songLength = 1;
-    private int time = 1;
+    public int songLength = 1;
+    public int time = 1;
     private int seekPostion = 0;
     private boolean isCompletionOnError = false;
     private int bufferedPercentage = 0;
@@ -222,7 +223,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
                 MediaPlayerInterfaceInstance.getInstance().getMpinterface().songCompleted(mediaPlayer, positionPlaying);
 
-            if (!AppUtils.isAppOnForeground()) {
+            if (!PlayMusicActivity.isInForground) {
                 positionPlaying += 1;
                 MediaPlayerService.mediaPlayerService.playSongAtPosition(positionPlaying);
             }

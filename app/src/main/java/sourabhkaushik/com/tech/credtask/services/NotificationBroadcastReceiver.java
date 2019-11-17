@@ -30,7 +30,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                     }
                     if (!ispaused) {
                         ispaused = true;
-                        if (!AppUtils.isAppOnForeground()) {
+                        if (!PlayMusicActivity.isInForground) {
                             String title = intent.getStringExtra("title");
                             String text = intent.getStringExtra("text");
                             int time = intent.getIntExtra("songPlayed",0);
@@ -43,7 +43,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                         SingleSongIntentService.getInstance().pauseMusic();
                     } else {
                         ispaused = false;
-                        if (!AppUtils.isAppOnForeground()) {
+                        if (!PlayMusicActivity.isInForground) {
                             String title = intent.getStringExtra("title");
                             String text = intent.getStringExtra("text");
                             int time = intent.getIntExtra("songPlayed",0);
@@ -57,7 +57,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                 }
                 if (intent.getAction().equalsIgnoreCase("nextSong")) {
 
-                    if (PlayMusicActivity.isInForground|| MainActivity.isInForground) {
+                    if (PlayMusicActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().nextMusic();
                     } else {
                         int position = Integer.parseInt(intent.getStringExtra("positionSong"));
@@ -79,7 +79,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
                 }
                 if (intent.getAction().equalsIgnoreCase("prevSong")) {
-                    if (PlayMusicActivity.isInForground||MainActivity.isInForground) {
+                    if (PlayMusicActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().prevMusic();
                     } else {
                         int position = Integer.parseInt(intent.getStringExtra("positionSong"));

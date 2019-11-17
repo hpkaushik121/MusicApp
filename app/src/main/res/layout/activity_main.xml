@@ -111,9 +111,10 @@
 
                             </LinearLayout>
 
-                            <ImageView
+                            <de.hdodenhof.circleimageview.CircleImageView
                                 android:id="@+id/musicImage"
                                 android:layout_width="@dimen/dimen_100"
+                                android:onClick="@{viewModel.onControllerClick}"
                                 android:layout_height="@dimen/dimen_100"
                                 android:layout_alignParentRight="true"
                                 android:layout_gravity="right"

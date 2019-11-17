@@ -59,44 +59,34 @@ import sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel;
 /**
  * Created by Gregory Rasmussen on 7/26/17.
  */
-public class MainActivity extends AppCompatActivity implements RequestListener, MediaPlayerInterface {
+public class MainActivity extends AppCompatActivity implements RequestListener {
     private DataViewModel dataViewModel;
-    public static boolean isInForground=false;
+    public static boolean isInForground = false;
     private ActivityMainBinding binding;
     Parcelable state;
     private Handler mUiHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View view = bind();
 
-        MediaPlayerInterfaceInstance.getInstance().setMpinterface(this);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isInForground=true;
-        DialogProgress.hideWithTag(this,"fragmentTag");
+        isInForground = true;
+        DialogProgress.hideWithTag(this, "fragmentTag");
         Window window = getWindow();
-        if(SingleSongIntentService.getInstance().getMediaPlayer()!=null
-        &&SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(binding.musicImage, View.ROTATION,
-                    0.0f, 360.0f);
-
-            objectAnimator.setDuration(4000);
-            objectAnimator.setRepeatCount(Animation.INFINITE);
-            objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.start();
-        }
-
+        binding.getViewModel().setHandler();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         }
 
     }
@@ -104,16 +94,15 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
     @Override
     protected void onPause() {
         super.onPause();
-        isInForground=false;
+        isInForground = false;
     }
 
     private View bind() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        dataViewModel = new DataViewModel(binding.getRoot(),this);
+        dataViewModel = new DataViewModel(binding.getRoot(), this);
         binding.setViewModel(dataViewModel);
-
         return binding.getRoot();
     }
 
@@ -131,9 +120,9 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
 
     @Override
     public void OnFailure(String message) {
-        if(message.equalsIgnoreCase("fragmentTag")){
-            DialogProgress.showWithTag(this,"fragmentTag");
-        }else {
+        if (message.equalsIgnoreCase("fragmentTag")) {
+            DialogProgress.showWithTag(this, "fragmentTag");
+        } else {
             DialogProgress.hide(this);
             new AlertDialog.Builder(this)
                     .setTitle("Error")
@@ -141,56 +130,6 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
                     .setMessage(message)
                     .show();
         }
-
-    }
-
-    @Override
-    public void bufferdPercentage(MediaPlayer mediaPlayer, int playedPerc) {
-
-    }
-
-    @Override
-    public void pauseMusic() {
-
-    }
-
-    @Override
-    public void nextMusic() {
-
-    }
-
-    @Override
-    public void prevMusic() {
-
-    }
-
-    @Override
-    public void resumeMusic() {
-
-    }
-
-    @Override
-    public void buffering(MediaPlayer mediaPlayer, boolean isBuffering) {
-
-    }
-
-    @Override
-    public void songLength(MediaPlayer mediaPlayer, int songLength) {
-
-    }
-
-    @Override
-    public void songCompleted(MediaPlayer mediaPlayer, int position) {
-
-    }
-
-    @Override
-    public void songPlayed(MediaPlayer mediaPlayer, int seconds) {
-
-    }
-
-    @Override
-    public void onPositionChange(List<DataModel> list,int pos) {
 
     }
 

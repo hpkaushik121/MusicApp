@@ -109,12 +109,46 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
             isPlaying = false;
             activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.play_btn));
         }
-        binding.seekBar.setOnSeekBarChangeListener(this);
+//        binding.seekBar.setOnSeekBarChangeListener(this);
         binding.playList.setLayoutManager(layoutManager);
         binding.playBtn.setOnClickListener(this);
         binding.prevSongBtn.setOnClickListener(this);
         binding.nextSongBtn.setOnClickListener(this);
         binding.playList.addOnScrollListener(new CenterScrollListener());
+
+        binding.seekBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                switch (motionEvent.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        int progress = binding.seekBar.getMax() - (int) ( binding.seekBar.getMax() * (binding.seekBar.getWidth()-motionEvent.getX()) /  binding.seekBar.getWidth());
+                        if(progress < 0) {progress = 0;}
+                        if(progress >  binding.seekBar.getMax()) {
+                            progress =  binding.seekBar.getMax();}
+                        binding.seekBar.setProgress(progress);
+//                        if(progress != lastProgress) {
+//                            lastProgress = progress;
+//                            Information.onSeekBarChangeListener.onProgressChanged(this, progress, true);
+//                        }
+//                        onSizeChanged(getWidth(), getHeight() , 0, 0);
+                        Log.i("radio", "action move");
+                        binding.seekBar.setPressed(true);
+                        binding.seekBar.setSelected(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int prog=binding.seekBar.getProgress();
+                        MediaPlayerService.mediaPlayerService.setMusicToSec(prog);
+                        binding.seekBar.setPressed(false);
+                        binding.seekBar.setSelected(false);
+                        break;
+                }
+                return true;
+            }
+        });
+
         if (activity.getIntent().hasExtra("position")) {
             final int position = activity.getIntent().getIntExtra("position", 0);
             layoutManager.scrollToPosition(position);
@@ -141,19 +175,6 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
         }
 
-        final GestureDetectorCompat gestureDetector=new GestureDetectorCompat(activity, new GestureDetector.SimpleOnGestureListener(){
-
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                float angle = (float) Math.toDegrees(Math.atan2(e1.getY() - e2.getY(), e2.getX() - e1.getX()));
-                if (angle > 45 && angle <= 135) {
-                    Log.d("DEBUG_TAG", "Down to Up swipe performed");
-                    onSwipUP();
-                    return true;
-                }
-                return false;
-            }
-        });
         activityMainBinding.dragTop.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
