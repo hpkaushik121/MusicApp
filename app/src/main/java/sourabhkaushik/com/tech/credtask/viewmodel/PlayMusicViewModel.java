@@ -1,6 +1,7 @@
 package sourabhkaushik.com.tech.credtask.viewmodel;
 
 import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -36,6 +37,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import sourabhkaushik.com.tech.credtask.BR;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.SweetAlert.CustomAlertDialog;
@@ -64,9 +66,10 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         SeekBar.OnSeekBarChangeListener, View.OnClickListener, CarouselLayoutManager.OnCenterItemSelectionListener {
 
     private List<DataModel> dataModels;
+    private boolean isScrollDueToPostion=false;
     private PlayListAdapter playListAdapter;
     public AppCompatActivity activity;
-    private CarouselLayoutManager layoutManager;
+    public CarouselLayoutManager layoutManager;
     private int totalSongLength = 0;
     private int _xDelta;
     private int _yDelta;
@@ -86,6 +89,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         playListAdapter = new PlayListAdapter(this);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void init(final ActivityPlayMusicBinding binding) {
         layoutManager = new CarouselLayoutManager(CarouselLayoutManager.HORIZONTAL, false);
         layoutManager.setPostLayoutListener(new CarouselZoomPostLayoutListener());
@@ -275,6 +279,40 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
     }
 
     @Override
+    public void onPositionChange(List<DataModel> list,int position) {
+
+        if(position<=MediaPlayerService.positionToplay){
+            isScrollDueToPostion=true;
+            if(dataModels.size()!=list.size()){
+                MediaPlayerService.positionToplay=MediaPlayerService.positionToplay-1;
+            }
+
+            layoutManager.scrollToPosition(position);
+
+        }
+
+        dataModels=list;
+        if(MediaPlayerService.positionToplay<dataModels.size()){
+            activityMainBinding.songName.setText(dataModels.get(MediaPlayerService.positionToplay).getTitle());
+            activityMainBinding.singerName.setText(dataModels.get(MediaPlayerService.positionToplay).getDescription());
+        }
+
+        if(position==0){
+            activityMainBinding.prevSongBtn.setVisibility(View.INVISIBLE);
+            activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
+        }
+        else if(position==dataModels.size()-1){
+            activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);
+            activityMainBinding.nextSongBtn.setVisibility(View.INVISIBLE);
+        }else{
+            activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);
+            activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
+        }
+        MediaPlayerService.albumList=list;
+       notifyPropertyChanged(BR.dataModels);
+    }
+
+    @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         if (b) {
             MediaPlayerService.mediaPlayerService.setMusicToSec(i);
@@ -324,6 +362,10 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
     @Override
     public void onCenterItemChanged(int adapterPosition) {
+        if(isScrollDueToPostion){
+            isScrollDueToPostion=false;
+            return;
+        }
         if (CarouselLayoutManager.INVALID_POSITION != adapterPosition) {
             activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
             activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);

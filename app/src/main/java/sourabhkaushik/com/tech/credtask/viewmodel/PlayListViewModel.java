@@ -1,6 +1,7 @@
 package sourabhkaushik.com.tech.credtask.viewmodel;
 
 import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.graphics.Matrix;
@@ -32,6 +33,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
@@ -45,6 +47,7 @@ import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.adapter.PlayListModalAdapter;
+import sourabhkaushik.com.tech.credtask.adapter.PlayListTouchHelperAdapter;
 import sourabhkaushik.com.tech.credtask.databinding.PlayListLayoutBinding;
 import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
 import sourabhkaushik.com.tech.credtask.interfaces.ListPlayingInterface;
@@ -75,6 +78,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
         this.playListFragment=fragment;
 
         adapter=new PlayListModalAdapter(MediaPlayerService.albumList,this);
+
     }
 
 
@@ -84,8 +88,12 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
        }
 
     }
+    @SuppressLint("ClickableViewAccessibility")
     public void init(final PlayListLayoutBinding playListLayoutBinding) {
         this.playListLayoutBinding = playListLayoutBinding;
+        PlayListTouchHelperAdapter playListTouchHelperAdapter=new PlayListTouchHelperAdapter(adapter);
+        ItemTouchHelper itemTouchHelper=new ItemTouchHelper(playListTouchHelperAdapter);
+        itemTouchHelper.attachToRecyclerView(playListLayoutBinding.playListModelList);
         playListLayoutBinding.playListModelList.setAdapter(adapter);
         Glide.with(MainApplication.getAppContext())
                 .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
@@ -96,6 +104,8 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
                 .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
                 .into(playListLayoutBinding.toolbarImage);
         moveViewToScreenCenter(playListLayoutBinding.toolbarImage);
+
+
 
         playListLayoutBinding.mainPath.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -216,6 +226,9 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
     }
 
     public void onItemClickFromList(Integer position){
+
+        playListLayoutBinding.getPlayMusicViewModel().layoutManager.scrollToPosition(position);
+        onSwipDown(400);
 
     }
 

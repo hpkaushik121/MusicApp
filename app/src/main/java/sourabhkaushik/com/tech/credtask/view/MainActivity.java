@@ -50,6 +50,7 @@ import sourabhkaushik.com.tech.credtask.databinding.ActivityMainBinding;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterface;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
 import sourabhkaushik.com.tech.credtask.interfaces.RequestListener;
+import sourabhkaushik.com.tech.credtask.model.DataModel;
 import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
 import sourabhkaushik.com.tech.credtask.services.SingleSongIntentService;
 import sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel;
@@ -179,6 +180,11 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
 
     @Override
     public void songPlayed(MediaPlayer mediaPlayer, int seconds) {
+
+    }
+
+    @Override
+    public void onPositionChange(List<DataModel> list,int pos) {
 
     }
 
