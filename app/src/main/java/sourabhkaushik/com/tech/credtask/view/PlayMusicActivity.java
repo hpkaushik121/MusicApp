@@ -54,7 +54,7 @@ public class PlayMusicActivity extends AppCompatActivity  {
         super.onResume();
         isInForground=true;
         View decorView = getWindow().getDecorView();
-
+        binding.getPlayMusicViewModel().setupView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |

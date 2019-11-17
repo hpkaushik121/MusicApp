@@ -62,26 +62,23 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 /**
  * Created by Sourabh kaushik on 11/5/2019.
  */
-public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInterface,
-        SeekBar.OnSeekBarChangeListener, View.OnClickListener, CarouselLayoutManager.OnCenterItemSelectionListener {
+public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInterface, View.OnClickListener, CarouselLayoutManager.OnCenterItemSelectionListener {
 
     private List<DataModel> dataModels;
-    private boolean isScrollDueToPostion=false;
     private PlayListAdapter playListAdapter;
-    public AppCompatActivity activity;
+    private AppCompatActivity activity;
     public CarouselLayoutManager layoutManager;
+    private ActivityPlayMusicBinding activityMainBinding;
+
     private int totalSongLength = 0;
-    private int _xDelta;
     private int _yDelta;
-    private int Y=0;
-    private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
     private int songPlayedSeconds = 0;
+
     private boolean ntIntent = false;
     private boolean isPlaying = true;
+    private boolean isScrollDueToPostion = false;
     public static boolean isBuffering = false;
-    private ActivityPlayMusicBinding activityMainBinding;
+
 
     public PlayMusicViewModel(AppCompatActivity activity) {
         dataModels = MediaPlayerService.albumList;
@@ -98,10 +95,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         imageView.setOnClickListener(this);
         layoutManager.addOnItemSelectionListener(this);
         activityMainBinding = binding;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            activityMainBinding.seekBar.setMin(0);
-        }
-        activityMainBinding.seekBar.setMax(100);
+
         if (SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()) {
             isPlaying = true;
             activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.pause_btn));
@@ -109,7 +103,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
             isPlaying = false;
             activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.play_btn));
         }
-//        binding.seekBar.setOnSeekBarChangeListener(this);
+
         binding.playList.setLayoutManager(layoutManager);
         binding.playBtn.setOnClickListener(this);
         binding.prevSongBtn.setOnClickListener(this);
@@ -120,26 +114,24 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                switch (motionEvent.getAction()){
+                switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        int progress = binding.seekBar.getMax() - (int) ( binding.seekBar.getMax() * (binding.seekBar.getWidth()-motionEvent.getX()) /  binding.seekBar.getWidth());
-                        if(progress < 0) {progress = 0;}
-                        if(progress >  binding.seekBar.getMax()) {
-                            progress =  binding.seekBar.getMax();}
+                        int progress = binding.seekBar.getMax() - (int) (binding.seekBar.getMax() * (binding.seekBar.getWidth() - motionEvent.getX()) / binding.seekBar.getWidth());
+                        if (progress < 0) {
+                            progress = 0;
+                        }
+                        if (progress > binding.seekBar.getMax()) {
+                            progress = binding.seekBar.getMax();
+                        }
                         binding.seekBar.setProgress(progress);
-//                        if(progress != lastProgress) {
-//                            lastProgress = progress;
-//                            Information.onSeekBarChangeListener.onProgressChanged(this, progress, true);
-//                        }
-//                        onSizeChanged(getWidth(), getHeight() , 0, 0);
                         Log.i("radio", "action move");
                         binding.seekBar.setPressed(true);
                         binding.seekBar.setSelected(true);
                         break;
                     case MotionEvent.ACTION_UP:
-                        int prog=binding.seekBar.getProgress();
+                        int prog = binding.seekBar.getProgress();
                         MediaPlayerService.mediaPlayerService.setMusicToSec(prog);
                         binding.seekBar.setPressed(false);
                         binding.seekBar.setSelected(false);
@@ -188,8 +180,8 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                     case MotionEvent.ACTION_UP:
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) view.getLayoutParams();
                         layoutParams.topMargin = 0;
-                        int Yaxis=Y-_yDelta;
-                        if(Yaxis<-300){
+                        int Yaxis = Y - _yDelta;
+                        if (Yaxis < -300) {
                             onSwipUP();
                         }
                         view.setLayoutParams(layoutParams);
@@ -199,13 +191,13 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                     case MotionEvent.ACTION_POINTER_UP:
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        LinearLayout.LayoutParams layoutPara= (LinearLayout.LayoutParams) view.getLayoutParams();
+                        LinearLayout.LayoutParams layoutPara = (LinearLayout.LayoutParams) view.getLayoutParams();
                         layoutPara.topMargin = Y - _yDelta;
                         view.setLayoutParams(layoutPara);
                         break;
                 }
                 binding.getRoot().invalidate();
-                 return true;
+                return true;
             }
         });
 
@@ -215,9 +207,9 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
     private void onSwipUP() {
         activityMainBinding.playListFragment.setVisibility(View.VISIBLE);
         activityMainBinding.playListFragment.bringToFront();
-        FragmentManager fragmentManager=activity.getSupportFragmentManager();
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.playListFragment,new PlayListFragment(PlayMusicViewModel.this),"playList")
+                .add(R.id.playListFragment, new PlayListFragment(PlayMusicViewModel.this), "playList")
                 .commitNowAllowingStateLoss();
     }
 
@@ -300,56 +292,38 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
     }
 
     @Override
-    public void onPositionChange(List<DataModel> list,int position) {
+    public void onPositionChange(List<DataModel> list, int position) {
 
-        if(position<=MediaPlayerService.positionToplay){
-            isScrollDueToPostion=true;
-            if(dataModels.size()!=list.size()){
-                MediaPlayerService.positionToplay=MediaPlayerService.positionToplay-1;
+        if (position <= MediaPlayerService.positionToplay) {
+            isScrollDueToPostion = true;
+            if (dataModels.size() != list.size()) {
+                MediaPlayerService.positionToplay = MediaPlayerService.positionToplay - 1;
             }
 
             layoutManager.scrollToPosition(position);
 
         }
 
-        dataModels=list;
-        if(MediaPlayerService.positionToplay<dataModels.size()){
+        dataModels = list;
+        if (MediaPlayerService.positionToplay < dataModels.size()) {
             activityMainBinding.songName.setText(dataModels.get(MediaPlayerService.positionToplay).getTitle());
             activityMainBinding.singerName.setText(dataModels.get(MediaPlayerService.positionToplay).getDescription());
         }
 
-        if(position==0){
+        if (position == 0) {
             activityMainBinding.prevSongBtn.setVisibility(View.INVISIBLE);
             activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
-        }
-        else if(position==dataModels.size()-1){
+        } else if (position == dataModels.size() - 1) {
             activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);
             activityMainBinding.nextSongBtn.setVisibility(View.INVISIBLE);
-        }else{
+        } else {
             activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);
             activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
         }
-        MediaPlayerService.albumList=list;
-       notifyPropertyChanged(BR.dataModels);
+        MediaPlayerService.albumList = list;
+        notifyPropertyChanged(BR.dataModels);
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        if (b) {
-            MediaPlayerService.mediaPlayerService.setMusicToSec(i);
-        }
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
 
     @Override
     public void onClick(View view) {
@@ -383,10 +357,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
     @Override
     public void onCenterItemChanged(int adapterPosition) {
-        if(isScrollDueToPostion){
-            isScrollDueToPostion=false;
-            return;
-        }
+
         if (CarouselLayoutManager.INVALID_POSITION != adapterPosition) {
             activityMainBinding.nextSongBtn.setVisibility(View.VISIBLE);
             activityMainBinding.prevSongBtn.setVisibility(View.VISIBLE);
@@ -405,16 +376,23 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
             activityMainBinding.singerName.setText(model.getDescription());
             activityMainBinding.songName.setText(model.getTitle());
-            totalSongLength=activity.getIntent().getIntExtra("songLength", 0);
+
+            if (isScrollDueToPostion) {
+                isScrollDueToPostion = false;
+                return;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activityMainBinding.seekBar.setMin(0);
+            }
+            activityMainBinding.seekBar.setMax(100);
+            totalSongLength = activity.getIntent().getIntExtra("songLength", 0);
             activityMainBinding.totalLength.setText(AppUtils.getsongLength(activity.getIntent().getIntExtra("songLength", 0)));
             activityMainBinding.playedLength.setText(AppUtils.getsongLength(activity.getIntent().getIntExtra("songPlayed", 0)));
             activityMainBinding.seekBar.setProgress(AppUtils.getSeekbarPercentage(activity.getIntent().getIntExtra("songLength", 0),
                     activity.getIntent().getIntExtra("songPlayed", 0)));
             if (isBuffering) {
                 activityMainBinding.rippleContent.startRippleAnimation();
-            }
-            if (activity.getIntent().hasExtra("intent")) {
-
             }
             if (!ntIntent && MediaPlayerService.positionToplay != adapterPosition) {
                 activityMainBinding.seekBar.setSecondaryProgress(0);
@@ -431,17 +409,17 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         activityMainBinding.seekBar.setEnabled(true);
         isPlaying = true;
         isBuffering = false;
-        FragmentManager fragmentManager =((AppCompatActivity)activity).getSupportFragmentManager();
-        Fragment fragment=fragmentManager.findFragmentByTag("playList");
-        if(fragment!=null){
+        FragmentManager fragmentManager = ((AppCompatActivity) activity).getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag("playList");
+        if (fragment != null) {
 
-            try{
-                PlayListFragment playListFragment=(PlayListFragment) fragment;
-                if(playListFragment.binding.getPlayListViewModel().prevPosition!=MediaPlayerService.positionToplay){
+            try {
+                PlayListFragment playListFragment = (PlayListFragment) fragment;
+                if (playListFragment.binding.getPlayListViewModel().prevPosition != MediaPlayerService.positionToplay) {
                     playListFragment.binding.getPlayListViewModel().playing();
                 }
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -461,13 +439,13 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
     private void setUiStopped() {
         isPlaying = false;
-        FragmentManager fragmentManager =((AppCompatActivity)activity).getSupportFragmentManager();
-        Fragment fragment=fragmentManager.findFragmentByTag("playList");
-        if(fragment!=null){
-            try{
-                PlayListFragment playListFragment=(PlayListFragment) fragment;
+        FragmentManager fragmentManager = ((AppCompatActivity) activity).getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag("playList");
+        if (fragment != null) {
+            try {
+                PlayListFragment playListFragment = (PlayListFragment) fragment;
                 playListFragment.binding.getPlayListViewModel().stopped();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -576,5 +554,13 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         }
 
 
+    }
+
+    public void setupView() {
+        if(layoutManager.getCenterItemPosition()!=CarouselLayoutManager.INVALID_POSITION
+                &&layoutManager.getCenterItemPosition()!=MediaPlayerService.positionToplay){
+            isScrollDueToPostion=true;
+            layoutManager.scrollToPosition(MediaPlayerService.positionToplay);
+        }
     }
 }

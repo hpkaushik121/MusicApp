@@ -314,6 +314,9 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     }
 
     public void onControllerClick(View view) {
+        if(MediaPlayerService.albumList!=null&&MediaPlayerService.albumList.size()==0){
+            return;
+        }
         Intent resultIntent = new Intent(activity, PlayMusicActivity.class);
         resultIntent.putExtra("intent", true);
         resultIntent.putExtra("position", MediaPlayerService.positionToplay);
