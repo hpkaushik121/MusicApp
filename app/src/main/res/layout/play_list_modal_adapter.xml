@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="position"
+            type="Integer" />
+        <variable
+            name="playListViewModel"
+            type="sourabhkaushik.com.tech.credtask.viewmodel.PlayListViewModel" />
+        <import type="android.view.View"/>
+
+    </data>
+<RelativeLayout
+    android:orientation="horizontal"
+    android:onClick="@{()->playListViewModel.onItemClickFromList(position)}"
+    android:layout_width="match_parent"
+    android:weightSum="10"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="@dimen/dimen_50"
+        android:src="@drawable/dummy"
+        android:layout_margin="@dimen/dimen_5"
+       android:id="@+id/songConver"
+        android:layout_height="@dimen/dimen_50" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/dimen_5"
+        android:layout_marginLeft="@dimen/dimen_60"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_60" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_20"
+        tools:text="Item 1" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/dimen_15"
+            tools:text="Item 1"
+            android:id="@+id/title_descrption"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="@dimen/dimen_40"
+        android:src="@drawable/note"
+        android:layout_margin="@dimen/dimen_5"
+        android:layout_centerVertical="true"
+        android:id="@+id/isPlaying"
+        android:layout_alignParentRight="true"
+        android:layout_height="@dimen/dimen_40"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>
+</layout>
