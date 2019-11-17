@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
     protected void onResume() {
         super.onResume();
         isInForground=true;
+        DialogProgress.hideWithTag(this,"fragmentTag");
         Window window = getWindow();
         if(SingleSongIntentService.getInstance().getMediaPlayer()!=null
         &&SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
@@ -130,12 +131,17 @@ public class MainActivity extends AppCompatActivity implements RequestListener, 
 
     @Override
     public void OnFailure(String message) {
-        DialogProgress.hide(this);
-        new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setCancelable(false)
-                .setMessage(message)
-                .show();
+        if(message.equalsIgnoreCase("fragmentTag")){
+            DialogProgress.showWithTag(this,"fragmentTag");
+        }else {
+            DialogProgress.hide(this);
+            new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setCancelable(false)
+                    .setMessage(message)
+                    .show();
+        }
+
     }
 
     @Override

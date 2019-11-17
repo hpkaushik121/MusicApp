@@ -57,6 +57,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     private boolean resumeOnFocusGain=true;
     private NotificationBroadcastReceiver broadcastReceiver;
     private final String focusLock="focusLock";
+    private boolean isPausePlayback=false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -100,6 +101,10 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void playbackNow() {
+        if(!isPausePlayback){
+            return;
+        }
+        isPausePlayback=false;
         if(SingleSongIntentService.getInstance().getMediaPlayer()!=null &&
                 !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
 
@@ -403,7 +408,11 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void pausePlayback() {
-        SingleSongIntentService.getInstance().pauseMusic();
+        if(SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
+            isPausePlayback=true;
+            SingleSongIntentService.getInstance().pauseMusic();
+        }
+
     }
 
 }

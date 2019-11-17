@@ -5,6 +5,9 @@
             name="position"
             type="Integer" />
         <variable
+            name="listPosition"
+            type="Integer" />
+        <variable
             name="dataViewModel"
             type="sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel" />
         <variable
@@ -13,7 +16,7 @@
     </data>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:onClick="@{()->dataViewModel.onDummyListItemClick(position)}"
+    android:onClick="@{()->dataViewModel.onDummyListItemClick(position,listPosition)}"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 

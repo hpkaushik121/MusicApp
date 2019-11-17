@@ -51,7 +51,7 @@ public class DummyAdapter extends RecyclerView.Adapter<DummyAdapter.DummyViewHol
     @Override
     public void onBindViewHolder(@NonNull DummyViewHolder holder, int position) {
         Album album=dummyData.get(position);
-       holder.getBinding().setDummyAdapterViewModel(new DummyAdapterViewModel(dataViewModel));
+       holder.getBinding().setDummyAdapterViewModel(new DummyAdapterViewModel(dataViewModel,position));
        holder.getBinding().getDummyAdapterViewModel().initRecyclerView(album.getAlbum(),holder.getBinding().getRoot());
         holder.bind(dataViewModel,new DataItemViewModel(album),position);
     }

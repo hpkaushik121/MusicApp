@@ -34,9 +34,10 @@ public class DummyAlbumAdapter extends RecyclerView.Adapter<DummyAlbumAdapter.Du
     public List<Album> albums;
     public DataViewModel dataViewModel;
     private Context mContext;
-
-    public DummyAlbumAdapter(DataViewModel model) {
+    private int listPosition;
+    public DummyAlbumAdapter(DataViewModel model,int lstPosition) {
         albums=new ArrayList<>();
+        this.listPosition=lstPosition;
         this.dataViewModel=model;
     }
 
@@ -92,6 +93,7 @@ public class DummyAlbumAdapter extends RecyclerView.Adapter<DummyAlbumAdapter.Du
             }
             binding.setDataViewModel(dataViewModel);
             binding.setAlbumModel(album);
+            binding.setListPosition(listPosition);
             binding.setPosition(position);
         }
 

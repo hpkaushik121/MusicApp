@@ -22,9 +22,9 @@ public class DummyAdapterViewModel extends BaseObservable {
 
     public DummyAlbumAdapter dummyAlbumAdapter;
     private List<Album> dummyAlbum;
-    public DummyAdapterViewModel(DataViewModel model) {
+    public DummyAdapterViewModel(DataViewModel model ,int lstPosition) {
         this.dummyAlbum=new ArrayList<>();
-        this.dummyAlbumAdapter=new DummyAlbumAdapter(model);
+        this.dummyAlbumAdapter=new DummyAlbumAdapter(model,lstPosition);
     }
     @Bindable
     public List<Album> getDummyAlbum() {

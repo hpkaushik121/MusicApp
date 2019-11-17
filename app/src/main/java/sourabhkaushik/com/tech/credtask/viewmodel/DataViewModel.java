@@ -34,6 +34,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -55,6 +56,7 @@ import sourabhkaushik.com.tech.credtask.adapter.DummyAdapter;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackLayoutManager;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackListener;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.CardStackView;
+import sourabhkaushik.com.tech.credtask.customRecyclerViews.DialogProgress;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.Direction;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.Duration;
 import sourabhkaushik.com.tech.credtask.customRecyclerViews.ResizeWidthAnimation;
@@ -267,13 +269,25 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     }
 
-    public void onDummyListItemClick(Integer position) {
+    public void onDummyListItemClick(Integer position,Integer listPosition) {
         if (view != null) {
+            List<Album> list=dummyData.get(listPosition).getAlbum();
+            List<DataModel> dataModels=new ArrayList<>();
+            listener.OnFailure("fragmentTag");
+            for (Album item:list) {
+                DataModel dataModel = new DataModel();
+                dataModel.setDescription(item.getArtists());
+                dataModel.setImage(item.getCoverImage());
+                dataModel.setSongUrl(item.getUrl());
+                dataModel.setTitle(String.valueOf(item.getSong()));
+                dataModels.add(dataModel);
+            }
             Intent intent = new Intent(view.getContext(), PlayMusicActivity.class);
             intent.putExtra("position", position);
-            intent.putExtra("title", data.get(position).getTitle());
-            intent.putExtra("description", data.get(position).getDescription());
-            MediaPlayerService.albumList = data;
+            intent.putExtra("title", dataModels.get(position).getTitle());
+            intent.putExtra("description", dataModels.get(position).getDescription());
+           MediaPlayerService.albumList=dataModels;
+
             view.getContext().startActivity(intent);
         }
     }

@@ -70,6 +70,27 @@ public class DialogProgress extends DialogFragment {
 
     }
 
+    public static void showWithTag(FragmentActivity activity, String tag) {
+
+        Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            // nothing to do
+            return;
+        }
+        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+        DialogProgress newDialog = new DialogProgress();
+        newDialog.setCancelable(false);
+        newDialog.setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Dialog);
+        try {
+            newDialog.show(ft, tag);
+        } catch (IllegalStateException e) {
+            // ignore commit failures due to state loss
+            Log.e(DialogFragment.class.getSimpleName(), "State Loss issue with Progress dialog", e);
+        }
+
+
+    }
+
     public static void showDialogWithCustomText(FragmentActivity activity, Bundle b) {
         Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(TAG);
         if (fragment != null) {
@@ -92,6 +113,14 @@ public class DialogProgress extends DialogFragment {
 
     public static void hide(FragmentActivity activity) {
         Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(TAG);
+        if (fragment != null) {
+            activity.getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        }
+
+    }
+
+    public static void hideWithTag(FragmentActivity activity, String tag) {
+        Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(tag);
         if (fragment != null) {
             activity.getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
         }
