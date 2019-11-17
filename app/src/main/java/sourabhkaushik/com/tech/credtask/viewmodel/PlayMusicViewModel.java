@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
@@ -192,7 +193,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         FragmentManager fragmentManager=activity.getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.playListFragment,new PlayListFragment(PlayMusicViewModel.this),"playList")
-                .commit();
+                .commitNowAllowingStateLoss();
     }
 
 
@@ -367,6 +368,20 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         activityMainBinding.seekBar.setEnabled(true);
         isPlaying = true;
         isBuffering = false;
+        FragmentManager fragmentManager =((AppCompatActivity)activity).getSupportFragmentManager();
+        Fragment fragment=fragmentManager.findFragmentByTag("playList");
+        if(fragment!=null){
+
+            try{
+                PlayListFragment playListFragment=(PlayListFragment) fragment;
+                if(playListFragment.binding.getPlayListViewModel().prevPosition!=MediaPlayerService.positionToplay){
+                    playListFragment.binding.getPlayListViewModel().playing();
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.pause_btn));
         activityMainBinding.rippleContent.stopRippleAnimation();
         MediaPlayerService.mediaPlayerService.updateNotification(
@@ -379,42 +394,20 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
         );
 
     }
-    public Animation fromAtoB(float fromX, float fromY, float toX, float toY, Animation.AnimationListener l, int speed){
 
 
-        Animation fromAtoB = new TranslateAnimation(
-                Animation.ABSOLUTE,
-                fromX,
-                Animation.ABSOLUTE,
-                toX,
-                Animation.ABSOLUTE, //to xType
-                fromY,
-                Animation.ABSOLUTE, //to yType
-                toY
-        );
-
-        fromAtoB.setDuration(speed);
-        fromAtoB.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
-
-
-        if(l != null)
-            fromAtoB.setAnimationListener(l);
-        return fromAtoB;
-    }
-
-
-    public Animation scaleView(View v, float startScale, float endScale) {
-        Animation anim = new ScaleAnimation(
-                1f, 1f, // Start and end values for the X axis scaling
-                startScale, endScale, // Start and end values for the Y axis scaling
-                Animation.RELATIVE_TO_SELF, 0f, // Pivot point of X scaling
-                Animation.RELATIVE_TO_SELF, 1f); // Pivot point of Y scaling
-        anim.setFillAfter(true); // Needed to keep the result of the animation
-        anim.setDuration(1000);
-       return anim;
-    }
     private void setUiStopped() {
         isPlaying = false;
+        FragmentManager fragmentManager =((AppCompatActivity)activity).getSupportFragmentManager();
+        Fragment fragment=fragmentManager.findFragmentByTag("playList");
+        if(fragment!=null){
+            try{
+                PlayListFragment playListFragment=(PlayListFragment) fragment;
+                playListFragment.binding.getPlayListViewModel().stopped();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         activityMainBinding.playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.play_btn));
         MediaPlayerService.mediaPlayerService.updateNotification(
                 songPlayedSeconds,

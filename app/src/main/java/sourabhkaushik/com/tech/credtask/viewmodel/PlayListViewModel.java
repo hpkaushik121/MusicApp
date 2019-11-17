@@ -24,21 +24,32 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.databinding.library.baseAdapters.BR;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import sourabhkaushik.com.tech.credtask.MainApplication;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
+import sourabhkaushik.com.tech.credtask.adapter.PlayListModalAdapter;
 import sourabhkaushik.com.tech.credtask.databinding.PlayListLayoutBinding;
 import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
+import sourabhkaushik.com.tech.credtask.interfaces.ListPlayingInterface;
+import sourabhkaushik.com.tech.credtask.model.DataModel;
+import sourabhkaushik.com.tech.credtask.model.PlayListModel;
 import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
@@ -46,8 +57,9 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 /**
  * Created by Sourabh kaushik on 11/16/2019.
  */
-public class PlayListViewModel extends AndroidViewModel {
+public class PlayListViewModel extends BaseObservable implements ListPlayingInterface {
 
+    public int prevPosition=MediaPlayerService.positionToplay;
     private Application application;
     private PlayListLayoutBinding playListLayoutBinding;
     private int prevYaxis;
@@ -56,22 +68,25 @@ public class PlayListViewModel extends AndroidViewModel {
     private float alpha = 1f;
     private int Y = 0;
     private PlayListFragment playListFragment;
-    private DisplayMetrics displayMetrics = new DisplayMetrics();
+    public PlayListModalAdapter adapter;
 
-    public PlayListViewModel(@NonNull Application application, PlayListFragment fragment) {
-        super(application);
+    public PlayListViewModel( PlayListFragment fragment) {
+
         this.playListFragment=fragment;
-        this.application = application;
+
+        adapter=new PlayListModalAdapter(MediaPlayerService.albumList,this);
     }
 
 
-    public PlayListViewModel(Application application, PlayMusicViewModel playMusicViewModel) {
-        super(application);
-        this.application = application;
-    }
+    public void updateList(){
+       if(adapter!=null){
+           adapter.notifyDataSetChanged();
+       }
 
+    }
     public void init(final PlayListLayoutBinding playListLayoutBinding) {
         this.playListLayoutBinding = playListLayoutBinding;
+        playListLayoutBinding.playListModelList.setAdapter(adapter);
         Glide.with(MainApplication.getAppContext())
                 .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
                 .apply(bitmapTransform(new BlurTransformation(45, 12)))
@@ -189,7 +204,7 @@ public class PlayListViewModel extends AndroidViewModel {
                 AppCompatActivity appCompatActivity= (AppCompatActivity) playListFragment.getActivity();
                 FrameLayout frameLayout=appCompatActivity.findViewById(R.id.playListFragment);
                 frameLayout.setVisibility(View.GONE);
-                fragmentManager.beginTransaction().remove(playListFragment).commit();
+                fragmentManager.beginTransaction().remove(playListFragment).commitNowAllowingStateLoss();
             }
 
             @Override
@@ -200,4 +215,36 @@ public class PlayListViewModel extends AndroidViewModel {
         fromImage.startAnimation(animSet);
     }
 
+    public void onItemClickFromList(Integer position){
+
+    }
+
+    @Override
+    public void playing() {
+        playListFragment.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Glide.with(MainApplication.getAppContext())
+                        .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                        .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                        .into(playListLayoutBinding.plBgImage);
+
+                Glide.with(MainApplication.getAppContext())
+                        .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                        .into(playListLayoutBinding.toolbarImage);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    @Override
+    public void stopped() {
+        playListFragment.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+        adapter.notifyDataSetChanged();
+            }
+        });
+    }
 }

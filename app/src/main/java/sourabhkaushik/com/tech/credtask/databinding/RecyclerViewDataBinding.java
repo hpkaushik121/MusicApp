@@ -30,9 +30,11 @@ import sourabhkaushik.com.tech.credtask.adapter.DataAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.DummyAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.DummyAlbumAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.PlayListAdapter;
+import sourabhkaushik.com.tech.credtask.adapter.PlayListModalAdapter;
 import sourabhkaushik.com.tech.credtask.model.Album;
 import sourabhkaushik.com.tech.credtask.model.AlbumListModel;
 import sourabhkaushik.com.tech.credtask.model.DataModel;
+import sourabhkaushik.com.tech.credtask.model.PlayListModel;
 
 /**
  * Created by Gregory Rasmussen on 7/26/17.

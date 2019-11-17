@@ -84,7 +84,7 @@ public class PlayMusicActivity extends AppCompatActivity  {
                     Log.e("error", e.getMessage());
                 else
                     e.printStackTrace();
-                manager.beginTransaction().remove(fragment).commit();
+                manager.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
             }
             return;
         }else{
