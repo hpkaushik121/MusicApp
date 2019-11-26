@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.media.session.PlaybackState;
+import android.os.Build;
 
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
@@ -31,6 +33,12 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                     }
                     if (!ispaused) {
                         ispaused = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            MediaPlayerService.mediaSession.setPlaybackState(new PlaybackState.Builder()
+                                    .setState(PlaybackState.STATE_PAUSED, 0, 0)
+                                    .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                                    .build());
+                        }
                         if (!PlayMusicActivity.isInForground) {
                             String title = intent.getStringExtra("title");
                             String text = intent.getStringExtra("text");
@@ -44,6 +52,12 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                         SingleSongIntentService.getInstance().pauseMusic();
                     } else {
                         ispaused = false;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            MediaPlayerService.mediaSession.setPlaybackState(new PlaybackState.Builder()
+                                    .setState(PlaybackState.STATE_PLAYING, 0, 0)
+                                    .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                                    .build());
+                        }
                         if (!PlayMusicActivity.isInForground) {
                             String title = intent.getStringExtra("title");
                             String text = intent.getStringExtra("text");

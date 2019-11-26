@@ -130,9 +130,10 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
-        mAdapter.onRowMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+
         return true;
     }
+
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder,
@@ -149,6 +150,12 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
         }
 
         super.onSelectedChanged(viewHolder, actionState);
+    }
+
+    @Override
+    public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
+        mAdapter.onRowMoved(fromPos,toPos);
     }
 
     @Override

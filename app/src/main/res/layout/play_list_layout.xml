@@ -65,13 +65,20 @@
                 android:padding="@dimen/dimen_10"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:id="@+id/playListModelList"
-                tools:listitem="@layout/play_list_modal_adapter"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:orientation="vertical"
-                android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:background="@color/gray"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:id="@+id/playListModelList"
+                        tools:listitem="@layout/play_list_modal_adapter"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 

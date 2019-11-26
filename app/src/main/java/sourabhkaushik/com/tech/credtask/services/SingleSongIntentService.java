@@ -125,20 +125,20 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
 
             mediaPlayer.pause();
-            if(!PlayMusicViewModel.isBuffering){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    MediaPlayerService.mediaPlayerService.stopForeground(false);
-                }else {
-                    ((NotificationManager) MainApplication.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE)).notify(1,MediaPlayerService.mediaPlayerService.getNotification(
-                            time,
-                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle(),
-                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
-                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
-                            BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
-                                    R.drawable.pause_black)
-                    ));
-                }
-            }
+//            if(!PlayMusicViewModel.isBuffering){
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    MediaPlayerService.mediaPlayerService.stopForeground(false);
+//                }else {
+//                    ((NotificationManager) MainApplication.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE)).notify(1,MediaPlayerService.mediaPlayerService.getNotification(
+//                            time,
+//                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle(),
+//                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
+//                            MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
+//                            BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
+//                                    R.drawable.pause_black)
+//                    ));
+//                }
+//            }
 
 
         }

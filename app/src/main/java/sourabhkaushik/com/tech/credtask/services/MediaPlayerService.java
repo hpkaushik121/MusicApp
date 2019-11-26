@@ -16,6 +16,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
+import android.media.MediaMetadataRetriever;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -40,6 +41,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +67,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     private boolean playbackDelayed = false;
     private AudioFocusRequest focusRequest;
     private boolean resumeOnFocusGain = true;
-    private MediaSession mediaSession;
+    public static MediaSession mediaSession;
     private MediaController mediaController;
     private NotificationBroadcastReceiver broadcastReceiver;
     private final String focusLock = "focusLock";
@@ -165,11 +167,15 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
 
         Bitmap icon = BitmapFactory.decodeResource(getApplication().getResources(),
                 android.R.drawable.ic_media_play);
+        String title=albumList==null?"":albumList.get(positionToplay).getTitle();
+        String description =albumList==null?"":albumList.get(positionToplay).getDescription();
+        String image=albumList==null?"":albumList.get(positionToplay).getImage();
+
         if (Build.VERSION.SDK_INT >= 26) {
-            startForeground(1, getForeGroundNotification(0, "Buffering", "", "", icon));
+            startForeground(1, getForeGroundNotification(0, title, description,image , icon));
 
         } else {
-            startForeground(1, getNotificationOngoing(0, "Buffering", "....", "", icon));
+            startForeground(1, getNotificationOngoing(0,  title, description,image, icon));
         }
 
         playSongAtPosition(positionToplay);
@@ -278,11 +284,6 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onPlay() {
                 super.onPlay();
-                mediaSession.setPlaybackState(new PlaybackState.Builder()
-                        .setState(PlaybackState.STATE_PAUSED, 0, 0)
-
-                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                        .build());
                 Intent pauseSong =new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
                 pauseSong.setAction("pauseSong");
                 Intent intentExtras = new Intent();
@@ -297,10 +298,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onPause() {
                 super.onPause();
-                mediaSession.setPlaybackState(new PlaybackState.Builder()
-                        .setState(PlaybackState.STATE_PLAYING, 0, 0)
-                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                        .build());
+
                 Intent pauseSong = new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
                 pauseSong.setAction("pauseSong");
                 Intent intentExtras = new Intent();
@@ -344,77 +342,159 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
 
         mediaController = new MediaController(this, mediaSession.getSessionToken());
         mediaSession.setPlaybackState(new PlaybackState.Builder()
-                .setState(PlaybackState.STATE_PAUSED, 0, 0)
+                .setState(PlaybackState.STATE_PLAYING, 0, 0)
                 .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
                 .build());
 
         mediaSession.setActive(true);
     }
 
-    private RemoteViews getContentView(String title, String text, final String image, Bitmap playbtnIcon) {
+    private RemoteViews getContentView(String title, final String text, final String image, Bitmap playbtnIcon) {
         final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification_layout);
         new RemoteViews(getPackageName(), R.layout.notification_layout);
         RequestOptions requestOptions = new RequestOptions();
         contentView.setImageViewBitmap(R.id.playBtnNotification, playbtnIcon);
         requestOptions = requestOptions.transforms(new CenterCrop());
         requestOptions.override(100, 100);
-        Glide.with(getApplicationContext())
-                .asBitmap()
-                .apply(requestOptions)
-                .load(image)
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        contentView.setImageViewBitmap(R.id.image, resource);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            mediaSession.setMetadata(new MediaMetadata.Builder()
-                                    .putString(MediaMetadata.METADATA_KEY_ARTIST, albumList.get(positionToplay).getDescription())
-                                    .putString(MediaMetadata.METADATA_KEY_ALBUM, "")
-                                    .putString(MediaMetadata.METADATA_KEY_TITLE, albumList.get(positionToplay).getTitle())
-                                    .putLong(MediaMetadata.METADATA_KEY_DURATION, 10000)
-                                    .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, resource)
-                                    //.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Test Artist")
-                                    .build());
-
-                            if (PlayMusicViewModel.isBuffering) {
-                                mediaSession.setPlaybackState(new PlaybackState.Builder()
-                                        .setState(PlaybackState.STATE_BUFFERING, 0, 0)
-                                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+        if(image.contains("http://")||image.contains("https://")){
+            Glide.with(getApplicationContext())
+                    .asBitmap()
+                    .apply(requestOptions)
+                    .load(image)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            contentView.setImageViewBitmap(R.id.image, resource);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                mediaSession.setMetadata(new MediaMetadata.Builder()
+                                        .putString(MediaMetadata.METADATA_KEY_ARTIST, albumList.get(positionToplay).getDescription())
+                                        .putString(MediaMetadata.METADATA_KEY_ALBUM, "")
+                                        .putString(MediaMetadata.METADATA_KEY_TITLE, albumList.get(positionToplay).getTitle())
+                                        .putLong(MediaMetadata.METADATA_KEY_DURATION, 10000)
+                                        .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, resource)
+                                        //.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Test Artist")
                                         .build());
+
+                                if (PlayMusicViewModel.isBuffering) {
+                                    mediaSession.setPlaybackState(new PlaybackState.Builder()
+                                            .setState(PlaybackState.STATE_BUFFERING, 0, 0)
+                                            .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                                            .build());
+                                }
+
+
                             }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                Palette palette = Palette.generate(resource);
+                                Palette.Swatch textSwatch=palette.getDominantSwatch();
+                                int color= getColor(R.color.white);
+                                if(textSwatch!=null){
+                                    color=textSwatch.getTitleTextColor();
+                                }
+                                GradientDrawable gradientDrawable = new GradientDrawable(
+                                        GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
+                                        palette.getDominantColor(getColor(R.color.black)),
+                                        palette.getDominantColor(getColor(R.color.black)),
+                                        palette.getDominantColor(getColor(R.color.black)),
+                                        palette.getDominantColor(getColor(R.color.black)),
+                                        getColor(R.color.transparent)});
 
+                                contentView.setInt(R.id.prevSongBtnNotification, "setColorFilter",color);
+                                contentView.setInt(R.id.playBtnNotification, "setColorFilter", color);
+                                contentView.setInt(R.id.nextSongBtnNotification, "setColorFilter", color);
+                                contentView.setTextColor(R.id.title, color);
+                                contentView.setTextColor(R.id.text, color);
 
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Palette palette = Palette.generate(resource);
-                            GradientDrawable gradientDrawable = new GradientDrawable(
-                                    GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
-                                    palette.getDominantColor(getColor(R.color.black)),
-                                    palette.getDominantColor(getColor(R.color.black)),
-                                    palette.getDominantColor(getColor(R.color.black)),
-                                    palette.getDominantColor(getColor(R.color.black)),
-                                    getColor(R.color.transparent)});
-                            contentView.setInt(R.id.prevSongBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setInt(R.id.playBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setInt(R.id.nextSongBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setTextColor(R.id.title, palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setTextColor(R.id.text, palette.getLightVibrantColor(getColor(R.color.white)));
+                                float dpi = getBaseContext().getResources().getDisplayMetrics().xdpi;
+                                float dp = getBaseContext().getResources().getDisplayMetrics().density;
 
-                            float dpi = getBaseContext().getResources().getDisplayMetrics().xdpi;
-                            float dp = getBaseContext().getResources().getDisplayMetrics().density;
-
-                            Bitmap bitmap = Bitmap.createBitmap(Math.round(288 * dp), Math.round(72 * dp), Bitmap.Config.ARGB_8888);
-                            Canvas canvas = new Canvas(bitmap);
-                            gradientDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                            gradientDrawable.setCornerRadius(5 * (dpi / 160));
-                            gradientDrawable.draw(canvas);
-                            contentView.setImageViewBitmap(R.id.bck_image, bitmap);
+                                Bitmap bitmap = Bitmap.createBitmap(Math.round(288 * dp), Math.round(72 * dp), Bitmap.Config.ARGB_8888);
+                                Canvas canvas = new Canvas(bitmap);
+                                gradientDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                                gradientDrawable.setCornerRadius(5 * (dpi / 160));
+                                gradientDrawable.draw(canvas);
+                                contentView.setImageViewBitmap(R.id.bck_image, bitmap);
 //                            contentView.setInt(R.id.close,"setBackground",palette.getDominantColor( getColor(R.color.white)));
 //                            contentView.setTextColor(R.id.close, palette.getLightVibrantColor(getColor(R.color.colorPrimary)));
+                            }
+
+                        }
+                    });
+
+        }else {
+            try{
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                byte[] rawArt;
+                Bitmap art;
+                BitmapFactory.Options bfo=new BitmapFactory.Options();
+                Uri uri= Uri.fromFile(new File(image));
+                mmr.setDataSource(getApplicationContext(), uri);
+                rawArt = mmr.getEmbeddedPicture();
+
+                if (null != rawArt){
+                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                    contentView.setImageViewBitmap(R.id.image, art);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        mediaSession.setMetadata(new MediaMetadata.Builder()
+                                .putString(MediaMetadata.METADATA_KEY_ARTIST, albumList.get(positionToplay).getDescription())
+                                .putString(MediaMetadata.METADATA_KEY_ALBUM, "")
+                                .putString(MediaMetadata.METADATA_KEY_TITLE, albumList.get(positionToplay).getTitle())
+                                .putLong(MediaMetadata.METADATA_KEY_DURATION, 10000)
+                                .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, art)
+                                //.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Test Artist")
+                                .build());
+
+                        if (PlayMusicViewModel.isBuffering) {
+                            mediaSession.setPlaybackState(new PlaybackState.Builder()
+                                    .setState(PlaybackState.STATE_BUFFERING, 0, 0)
+                                    .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                                    .build());
                         }
 
+
                     }
-                });
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Palette palette = Palette.generate(art);
+                        Palette.Swatch textSwatch=palette.getDominantSwatch();
+                        int color= getColor(R.color.white);
+                        if(textSwatch!=null){
+                            color=textSwatch.getTitleTextColor();
+                        }
+                        GradientDrawable gradientDrawable = new GradientDrawable(
+                                GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
+                                palette.getDominantColor(getColor(R.color.black)),
+                                palette.getDominantColor(getColor(R.color.black)),
+                                palette.getDominantColor(getColor(R.color.black)),
+                                palette.getDominantColor(getColor(R.color.black)),
+                                getColor(R.color.transparent)});
+                        contentView.setInt(R.id.prevSongBtnNotification, "setColorFilter", color);
+                        contentView.setInt(R.id.playBtnNotification, "setColorFilter", color);
+                        contentView.setInt(R.id.nextSongBtnNotification, "setColorFilter", color);
+                        contentView.setTextColor(R.id.title, color);
+                        contentView.setTextColor(R.id.text, color);
+
+                        float dpi = getBaseContext().getResources().getDisplayMetrics().xdpi;
+                        float dp = getBaseContext().getResources().getDisplayMetrics().density;
+
+                        Bitmap bitmap = Bitmap.createBitmap(Math.round(288 * dp), Math.round(72 * dp), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        gradientDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        gradientDrawable.setCornerRadius(5 * (dpi / 160));
+                        gradientDrawable.draw(canvas);
+                        contentView.setImageViewBitmap(R.id.bck_image, bitmap);
+//                            contentView.setInt(R.id.close,"setBackground",palette.getDominantColor( getColor(R.color.white)));
+//                            contentView.setTextColor(R.id.close, palette.getLightVibrantColor(getColor(R.color.colorPrimary)));
+                    }
+
+
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
 
 
         Intent intentExtras = new Intent();

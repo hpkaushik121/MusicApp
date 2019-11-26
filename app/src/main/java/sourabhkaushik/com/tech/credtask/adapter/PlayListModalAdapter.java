@@ -72,6 +72,7 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
 
     @Override
     public void onRowMoved(int fromPosition, int toPosition) {
+        DataModel dataModel=data.get(MediaPlayerService.positionToplay);
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(data, i, i + 1);
@@ -81,28 +82,32 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
                 Collections.swap(data, i, i - 1);
             }
         }
-        if(fromPosition==MediaPlayerService.positionToplay){
-            MediaPlayerService.positionToplay=toPosition;
-            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
-            notifyItemMoved(fromPosition, toPosition);
-        }
-        else if(toPosition<=MediaPlayerService.positionToplay){
-            if(fromPosition>MediaPlayerService.positionToplay){
-                MediaPlayerService.positionToplay++;
-            }
+        MediaPlayerService.positionToplay=data.indexOf(dataModel);
 
-            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),MediaPlayerService.positionToplay);
-            notifyItemMoved(fromPosition, toPosition);
-        }else {
-            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
-            notifyItemMoved(fromPosition, toPosition);
-        }
+//        if(fromPosition==MediaPlayerService.positionToplay){
+//            MediaPlayerService.positionToplay=toPosition;
+//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
+//            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
+//                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
+//            notifyItemMoved(fromPosition, toPosition);
+//        }
+//        else if(toPosition<=MediaPlayerService.positionToplay){
+//            if(fromPosition>MediaPlayerService.positionToplay){
+//                MediaPlayerService.positionToplay++;
+//            }
+//
+//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
+//            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
+//                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),MediaPlayerService.positionToplay);
+//            notifyItemMoved(fromPosition, toPosition);
+//        }else {
+//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
+//
+//        }
+        Type listType = new TypeToken<List<DataModel>>() {}.getType();
+        MediaPlayerInterfaceInstance.getInstance().getMpinterface()
+                .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
+        notifyItemMoved(fromPosition, toPosition);
 
     }
 
@@ -130,7 +135,9 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
             return;
 
         }
+        DataModel dataModel=data.get(MediaPlayerService.positionToplay);
         data.remove(position);
+        MediaPlayerService.positionToplay=data.indexOf(dataModel);
         Type listType = new TypeToken<List<DataModel>>() {}.getType();
         MediaPlayerInterfaceInstance
                 .getInstance()

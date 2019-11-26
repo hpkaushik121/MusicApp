@@ -15,6 +15,7 @@
     android:orientation="horizontal"
     android:onClick="@{()->playListViewModel.onItemClickFromList(position)}"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:weightSum="10"
     android:layout_height="wrap_content">
     <ImageView

@@ -305,16 +305,17 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
     @Override
     public void onPositionChange(List<DataModel> list, int position) {
 
-        if (position <= MediaPlayerService.positionToplay) {
-            isScrollDueToPostion = true;
-            if (dataModels.size() != list.size()) {
-                MediaPlayerService.positionToplay = MediaPlayerService.positionToplay - 1;
-            }
-
-            layoutManager.scrollToPosition(position);
-
-        }
-
+//        if (position <= MediaPlayerService.positionToplay) {
+//            isScrollDueToPostion = true;
+//            if (dataModels.size() != list.size()) {
+//                MediaPlayerService.positionToplay = MediaPlayerService.positionToplay - 1;
+//            }
+//
+//
+//
+//        }
+        isScrollDueToPostion = true;
+        layoutManager.scrollToPosition(MediaPlayerService.positionToplay);
         dataModels = list;
         if (MediaPlayerService.positionToplay < dataModels.size()) {
             activityMainBinding.songName.setText(dataModels.get(MediaPlayerService.positionToplay).getTitle());
