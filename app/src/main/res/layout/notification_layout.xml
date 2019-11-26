@@ -9,7 +9,7 @@
         android:id="@+id/image"
         android:layout_width="@dimen/dimen_100"
         android:layout_height="@dimen/dimen_100"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -61,23 +61,26 @@
         android:orientation="horizontal"
         android:layout_height="wrap_content">
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/dimen_30"
             android:layout_weight="1"
+            android:scaleType="fitCenter"
             android:id="@+id/prevSongBtnNotification"
-            android:src="@android:drawable/ic_media_previous"
+            android:src="@drawable/skip_previous"
             android:layout_height="wrap_content" />
 
         <ImageView
-            android:layout_width="@dimen/dimen_50"
+            android:layout_width="@dimen/dimen_60"
             android:layout_weight="5"
             android:id="@+id/playBtnNotification"
-            android:src="@android:drawable/ic_media_play"
+            android:scaleType="fitCenter"
+            android:src="@drawable/arrow_play"
             android:layout_height="@dimen/dimen_50" />
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/dimen_30"
             android:layout_weight="1"
+            android:scaleType="fitCenter"
             android:id="@+id/nextSongBtnNotification"
-            android:src="@android:drawable/ic_media_next"
+            android:src="@drawable/skip_next"
             android:layout_height="wrap_content" />
     </LinearLayout>
 

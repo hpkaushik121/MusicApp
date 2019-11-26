@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 
+import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
 import sourabhkaushik.com.tech.credtask.view.MainActivity;
@@ -36,7 +37,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                             int time = intent.getIntExtra("songPlayed",0);
                             String image = intent.getStringExtra("image");
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
-                                    android.R.drawable.ic_media_play));
+                                    R.drawable.arrow_play));
                         }
 
 
@@ -49,7 +50,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                             int time = intent.getIntExtra("songPlayed",0);
                             String image = intent.getStringExtra("image");
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
-                                    android.R.drawable.ic_media_play));
+                                    R.drawable.arrow_play));
                         }
                         SingleSongIntentService.getInstance().resumeMusic(false);
                     }
@@ -71,7 +72,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                             int time = 0;
                             MediaPlayerService.mediaPlayerService.playSongAtPosition(position);
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
-                                    android.R.drawable.ic_media_play));
+                                    R.drawable.arrow_play));
                         }
 
 
@@ -91,7 +92,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                             int time = 0;
                             MediaPlayerService.mediaPlayerService.playSongAtPosition(position);
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
-                                    android.R.drawable.ic_media_play));
+                                    R.drawable.arrow_play));
                         }
 
                     }

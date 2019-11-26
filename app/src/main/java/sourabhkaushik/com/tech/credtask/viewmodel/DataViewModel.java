@@ -24,8 +24,15 @@ package sourabhkaushik.com.tech.credtask.viewmodel;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -50,6 +57,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,13 +97,23 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     public List<DataModel> data;
     private List<Album> dummyData;
     private View view;
-    private int currentSongPosition=-1;
+    private int currentSongPosition = -1;
     private RequestListener listener;
     private Activity activity;
-    private   Handler handler=new Handler();
-    private  ObjectAnimator objectAnimator;
+    private Handler handler = new Handler();
+    private ObjectAnimator objectAnimator;
     private CardStackLayoutManager manager;
     private CardStackView recyclerView;
+    private String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+
+    private String[] projection = {
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.DURATION
+    };
 
     public DataViewModel(View view, Activity act) {
         data = new ArrayList<>();
@@ -111,7 +129,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     private void initRecyclerView(View view) {
         this.view = view;
-        CircleImageView imageView=activity.findViewById(R.id.musicImage);
+        CircleImageView imageView = activity.findViewById(R.id.musicImage);
         objectAnimator = ObjectAnimator.ofFloat(imageView, View.ROTATION,
                 0.0f, 360.0f);
 
@@ -145,10 +163,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
         recyclerView.setLayoutManager(manager);
 
 
-
     }
-
-
 
 
     @Bindable
@@ -173,72 +188,96 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     private void populateData() {
         // populate the data from the source, such as the database.
-        listener.onStarted();
-
-        LiveData<String> response = ApiRequest.getMusicList();
-        if (response != null) {
-            response.observe((LifecycleOwner) activity, new Observer<String>() {
-                @Override
-                public void onChanged(String s) {
-
-                    if (s != null) {
-                        try {
-
-                            Type listType = new TypeToken<List<Album>>() {
-                            }.getType();
-                            List<Album> itemsList = new Gson().fromJson(s, listType);
-                            AlbumListModel albumListModel = new AlbumListModel();
-                            albumListModel.setStatus(true);
-                            List<Album> albums = new ArrayList<>();
-                            Album album = new Album();
-                            album.setType("Popular");
-                            album.setAlbum(itemsList);
-
-                            albums.add(album);
-                            album = new Album();
-                            album.setType("New Songs");
-                            album.setAlbum(itemsList);
-                            albums.add(album);
-                            album = new Album();
-                            album.setType("New Songs");
-                            album.setAlbum(itemsList);
-                            albums.add(album);
-                            album = new Album();
-                            album.setType("New Songs");
-                            album.setAlbum(itemsList);
-                            albums.add(album);
-                            album = new Album();
-                            album.setType("New Songs");
-                            album.setAlbum(itemsList);
-                            albums.add(album);
-
-                            albumListModel.setAlbums(albums);
+//        listener.onStarted();
 
 
-                            dummyData = albumListModel.getAlbums();
-                            for (Album item : itemsList) {
-                                DataModel dataModel = new DataModel();
-                                dataModel.setDescription(item.getArtists());
-                                dataModel.setImage(item.getCoverImage());
-                                dataModel.setSongUrl(item.getUrl());
-                                dataModel.setTitle(String.valueOf(item.getSong()));
+        Cursor cursor = activity.managedQuery(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null);
 
-                                data.add(dataModel);
-                            }
-                            notifyPropertyChanged(BR.data);
-                            notifyPropertyChanged(BR.dummyData);
-                            listener.onSuccess();
-                        } catch (Exception e) {
-                            listener.OnFailure("Something went wrong check your internet connection");
-                        }
-                    } else {
-                        listener.OnFailure("Something went wrong check your internet connection");
-                    }
+        while (cursor.moveToNext()) {
+            Log.d("songData", cursor.getString(0) + "||" + cursor.getString(1) + "||" + cursor.getString(2) + "||" + cursor.getString(3) + "||" + cursor.getString(4) + "||" + cursor.getString(5));
+            DataModel dataModel = new DataModel();
+            dataModel.setDescription(cursor.getString(1));
+            dataModel.setImage(cursor.getString(3));
+            dataModel.setSongUrl(cursor.getString(3));
+            dataModel.setTitle(cursor.getString(2));
 
+            data.add(dataModel);
 
-                }
-            });
         }
+        notifyPropertyChanged(BR.data);
+        notifyPropertyChanged(BR.dummyData);
+//        listener.onSuccess();
+        LiveData<String> response = ApiRequest.getMusicList();
+//        if (response != null) {
+//            response.observe((LifecycleOwner) activity, new Observer<String>() {
+//                @Override
+//                public void onChanged(String s) {
+//
+//                    if (s != null) {
+//                        try {
+//
+//                            Type listType = new TypeToken<List<Album>>() {
+//                            }.getType();
+//                            List<Album> itemsList = new Gson().fromJson(s, listType);
+//                            AlbumListModel albumListModel = new AlbumListModel();
+//                            albumListModel.setStatus(true);
+//                            List<Album> albums = new ArrayList<>();
+//                            Album album = new Album();
+//                            album.setType("Popular");
+//                            album.setAlbum(itemsList);
+//
+//                            albums.add(album);
+//                            album = new Album();
+//                            album.setType("New Songs");
+//                            album.setAlbum(itemsList);
+//                            albums.add(album);
+//                            album = new Album();
+//                            album.setType("New Songs");
+//                            album.setAlbum(itemsList);
+//                            albums.add(album);
+//                            album = new Album();
+//                            album.setType("New Songs");
+//                            album.setAlbum(itemsList);
+//                            albums.add(album);
+//                            album = new Album();
+//                            album.setType("New Songs");
+//                            album.setAlbum(itemsList);
+//                            albums.add(album);
+//
+//                            albumListModel.setAlbums(albums);
+//
+//
+//                            dummyData = albumListModel.getAlbums();
+//
+//
+////                            for (Album item : itemsList) {
+////                                DataModel dataModel = new DataModel();
+////                                dataModel.setDescription(item.getArtists());
+////                                dataModel.setImage(item.getCoverImage());
+////                                dataModel.setSongUrl(item.getUrl());
+////                                dataModel.setTitle(String.valueOf(item.getSong()));
+////
+////                                data.add(dataModel);
+////                            }
+//                            notifyPropertyChanged(BR.data);
+//                            notifyPropertyChanged(BR.dummyData);
+//                            listener.onSuccess();
+//                        } catch (Exception e) {
+//                            listener.OnFailure("Something went wrong check your internet connection");
+//                        }
+//                    } else {
+//                        listener.OnFailure("Something went wrong check your internet connection");
+//                    }
+//
+//
+//                }
+//            });
+//        }
 
     }
 
@@ -246,7 +285,6 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     public void onCardDragging(Direction direction, float ratio) {
 
     }
-
 
 
     @Override
@@ -290,12 +328,12 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     }
 
-    public void onDummyListItemClick(Integer position,Integer listPosition) {
+    public void onDummyListItemClick(Integer position, Integer listPosition) {
         if (view != null) {
-            List<Album> list=dummyData.get(listPosition).getAlbum();
-            List<DataModel> dataModels=new ArrayList<>();
+            List<Album> list = dummyData.get(listPosition).getAlbum();
+            List<DataModel> dataModels = new ArrayList<>();
             listener.OnFailure("fragmentTag");
-            for (Album item:list) {
+            for (Album item : list) {
                 DataModel dataModel = new DataModel();
                 dataModel.setDescription(item.getArtists());
                 dataModel.setImage(item.getCoverImage());
@@ -307,14 +345,14 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
             intent.putExtra("position", position);
             intent.putExtra("title", dataModels.get(position).getTitle());
             intent.putExtra("description", dataModels.get(position).getDescription());
-           MediaPlayerService.albumList=dataModels;
+            MediaPlayerService.albumList = dataModels;
 
             view.getContext().startActivity(intent);
         }
     }
 
     public void onControllerClick(View view) {
-        if(MediaPlayerService.albumList!=null&&MediaPlayerService.albumList.size()==0){
+        if (MediaPlayerService.albumList != null && MediaPlayerService.albumList.size() == 0) {
             return;
         }
         Intent resultIntent = new Intent(activity, PlayMusicActivity.class);
@@ -326,24 +364,41 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
         resultIntent.putExtra("description", MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription());
         activity.startActivity(resultIntent);
     }
+
     private void setImage(final int pos) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                CircleImageView imageView=activity.findViewById(R.id.musicImage);
+                CircleImageView imageView = activity.findViewById(R.id.musicImage);
                 if (SingleSongIntentService.getInstance().getMediaPlayer() != null
-                        && SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()&&!objectAnimator.isRunning()) {
+                        && SingleSongIntentService.getInstance().getMediaPlayer().isPlaying() && !objectAnimator.isRunning()) {
 
                     objectAnimator.start();
-                }else if(SingleSongIntentService.getInstance().getMediaPlayer() != null
-                        && !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()&&objectAnimator.isRunning()){
+                } else if (SingleSongIntentService.getInstance().getMediaPlayer() != null
+                        && !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying() && objectAnimator.isRunning()) {
                     objectAnimator.cancel();
                 }
 
 
-                if(currentSongPosition!=pos){
-                    Glide.with(activity).load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()).into(imageView);
-                    currentSongPosition=pos;
+                if (currentSongPosition != pos) {
+
+                    if(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://")){
+                        Glide.with(activity).load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()).into(imageView);
+                    }else {
+
+                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                        byte[] rawArt;
+                        Bitmap art;
+                        BitmapFactory.Options bfo=new BitmapFactory.Options();
+                        Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+                        mmr.setDataSource(activity, uri);
+                        rawArt = mmr.getEmbeddedPicture();
+                        if (null != rawArt){
+                            art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                            Glide.with(activity).load(art).into(imageView);
+                        }
+
+                    }currentSongPosition = pos;
                 }
             }
         });
@@ -352,21 +407,20 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
 
     public void setHandler() {
-      Runnable runnable=new Runnable() {
-          @Override
-          public void run() {
-              try
-              {
-                      setImage(MediaPlayerService.positionToplay);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setImage(MediaPlayerService.positionToplay);
 
-              }catch (Exception e){
+                } catch (Exception e) {
 
-              }finally {
-                  handler.postDelayed(this,1000);
-              }
+                } finally {
+                    handler.postDelayed(this, 1000);
+                }
 
-          }
-      };
-       handler.post(runnable);
+            }
+        };
+        handler.post(runnable);
     }
 }

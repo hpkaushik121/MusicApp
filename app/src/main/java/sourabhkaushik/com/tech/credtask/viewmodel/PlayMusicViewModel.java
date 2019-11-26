@@ -4,9 +4,12 @@ import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,6 +37,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -150,7 +154,10 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
             if (!activity.getIntent().hasExtra("intent")) {
                 ntIntent = false;
                 binding.rippleContent.startRippleAnimation();
-                isBuffering = true;
+                if(MediaPlayerService.albumList.get(position).getImage().contains("http://")||MediaPlayerService.albumList.get(position).getImage().contains("https://")){
+                    isBuffering = true;
+                }
+
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     Intent intent = new Intent(activity, MediaPlayerService.class);
@@ -257,14 +264,18 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
 
     @Override
     public void buffering(MediaPlayer mediaPlayer, boolean isBuffer) {
-        isBuffering = isBuffer;
-        if (isBuffering) {
-            setUiBuffering();
-        } else {
-            if (!isPlaying && mediaPlayer.isPlaying()) {
-                setUiPlaying();
+        if(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||
+                MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://")){
+            isBuffering = isBuffer;
+            if (isBuffering) {
+                setUiBuffering();
+            } else {
+                if (!isPlaying && mediaPlayer.isPlaying()) {
+                    setUiPlaying();
+                }
             }
         }
+
 
     }
 
@@ -368,11 +379,32 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                 activityMainBinding.prevSongBtn.setVisibility(View.INVISIBLE);
             }
             final DataModel model = dataModels.get(adapterPosition);
-            Glide.with(activityMainBinding.getRoot())
-                    .load(model.getImage())
-                    .placeholder(R.drawable.dummy_blur)
-                    .apply(bitmapTransform(new BlurTransformation(45, 12)))
-                    .into(activityMainBinding.background);
+
+            if(model.getImage().contains("http://")||model.getImage().contains("https://")){
+                Glide.with(activityMainBinding.getRoot())
+                        .load(model.getImage())
+                        .placeholder(R.drawable.dummy_blur)
+                        .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                        .into(activityMainBinding.background);
+            }else {
+
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                byte[] rawArt;
+                Bitmap art;
+                BitmapFactory.Options bfo=new BitmapFactory.Options();
+                Uri uri= Uri.fromFile(new File(model.getImage()));
+                mmr.setDataSource(activity, uri);
+                rawArt = mmr.getEmbeddedPicture();
+                if (null != rawArt){
+                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                    Glide.with(activityMainBinding.getRoot())
+                            .load(art)
+                            .placeholder(R.drawable.dummy_blur)
+                            .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                            .into(activityMainBinding.background);
+                }
+
+            }
 
             activityMainBinding.singerName.setText(model.getDescription());
             activityMainBinding.songName.setText(model.getTitle());
@@ -431,7 +463,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                 dataModels.get(MediaPlayerService.positionToplay).getDescription(),
                 dataModels.get(MediaPlayerService.positionToplay).getImage(),
                 BitmapFactory.decodeResource(activityMainBinding.getRoot().getResources(),
-                        android.R.drawable.ic_media_pause)
+                        R.drawable.pause_black)
         );
 
     }
@@ -456,7 +488,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                 dataModels.get(MediaPlayerService.positionToplay).getDescription(),
                 dataModels.get(MediaPlayerService.positionToplay).getImage(),
                 BitmapFactory.decodeResource(activityMainBinding.getRoot().getResources(),
-                        android.R.drawable.ic_media_play)
+                        R.drawable.arrow_play)
         );
     }
 
@@ -472,7 +504,7 @@ public class PlayMusicViewModel extends BaseObservable implements MediaPlayerInt
                 dataModels.get(MediaPlayerService.positionToplay).getDescription(),
                 dataModels.get(MediaPlayerService.positionToplay).getImage(),
                 BitmapFactory.decodeResource(activityMainBinding.getRoot().getResources(),
-                        android.R.drawable.ic_media_play)
+                        R.drawable.arrow_play)
         );
     }
 

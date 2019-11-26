@@ -1,6 +1,10 @@
 package sourabhkaushik.com.tech.credtask.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +54,23 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
         holder.getBinding().coverImage.bringToFront();
-        Glide.with(context).load(dataModel.getImage()).apply(requestOptions).into(holder.getBinding().coverImage);
+        if(dataModel.getImage().contains("http://")||dataModel.getImage().contains("https://")){
+            Glide.with(context).load(dataModel.getImage()).apply(requestOptions).into(holder.binding.coverImage);
+        }else {
+
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            byte[] rawArt;
+            Bitmap art;
+            BitmapFactory.Options bfo=new BitmapFactory.Options();
+            Uri uri= Uri.fromFile(new File(dataModel.getImage()));
+            mmr.setDataSource(context, uri);
+            rawArt = mmr.getEmbeddedPicture();
+            if (null != rawArt){
+                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                Glide.with(context).load(art).apply(requestOptions).into(holder.binding.coverImage);
+            }
+
+        }
         holder.bind(dataModel,position);
     }
 

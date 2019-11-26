@@ -4,10 +4,14 @@ import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.location.Location;
 import android.media.Image;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -39,6 +43,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,15 +100,44 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
         ItemTouchHelper itemTouchHelper=new ItemTouchHelper(playListTouchHelperAdapter);
         itemTouchHelper.attachToRecyclerView(playListLayoutBinding.playListModelList);
         playListLayoutBinding.playListModelList.setAdapter(adapter);
-        Glide.with(MainApplication.getAppContext())
-                .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                .apply(bitmapTransform(new BlurTransformation(45, 12)))
-                .into(playListLayoutBinding.plBgImage);
 
-        Glide.with(MainApplication.getAppContext())
-                .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                .into(playListLayoutBinding.toolbarImage);
+        if(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://")){
+
+            Glide.with(MainApplication.getAppContext())
+                    .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                    .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                    .into(playListLayoutBinding.plBgImage);
+
+            Glide.with(MainApplication.getAppContext())
+                    .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                    .into(playListLayoutBinding.toolbarImage);
+
+        }else {
+
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            byte[] rawArt;
+            Bitmap art;
+            BitmapFactory.Options bfo=new BitmapFactory.Options();
+            Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+            mmr.setDataSource(MainApplication.getAppContext(), uri);
+            rawArt = mmr.getEmbeddedPicture();
+            if (null != rawArt){
+                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                Glide.with(MainApplication.getAppContext())
+                        .load(art)
+                        .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                        .into(playListLayoutBinding.plBgImage);
+
+                Glide.with(MainApplication.getAppContext())
+                        .load(art)
+                        .into(playListLayoutBinding.toolbarImage);
+            }
+
+        }
+
+
         moveViewToScreenCenter(playListLayoutBinding.toolbarImage);
+
 
 
 
@@ -237,14 +271,44 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
         playListFragment.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Glide.with(MainApplication.getAppContext())
-                        .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                        .apply(bitmapTransform(new BlurTransformation(45, 12)))
-                        .into(playListLayoutBinding.plBgImage);
+                if(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://")){
+                    Glide.with(MainApplication.getAppContext())
+                            .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                            .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                            .into(playListLayoutBinding.plBgImage);
 
-                Glide.with(MainApplication.getAppContext())
-                        .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                        .into(playListLayoutBinding.toolbarImage);
+                    Glide.with(MainApplication.getAppContext())
+                            .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
+                            .into(playListLayoutBinding.toolbarImage);
+                }else {
+
+                    MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                    byte[] rawArt;
+                    Bitmap art;
+                    BitmapFactory.Options bfo=new BitmapFactory.Options();
+                    Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+                    mmr.setDataSource(MainApplication.getAppContext(), uri);
+                    rawArt = mmr.getEmbeddedPicture();
+                    if (null != rawArt){
+                        art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                        Glide.with(MainApplication.getAppContext())
+                                .load(art)
+                                .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                                .into(playListLayoutBinding.plBgImage);
+
+                        Glide.with(MainApplication.getAppContext())
+                                .load(art)
+                                .into(playListLayoutBinding.toolbarImage);
+                    }
+
+                }
+
+
+
+
+
+
+
                 adapter.notifyDataSetChanged();
             }
         });

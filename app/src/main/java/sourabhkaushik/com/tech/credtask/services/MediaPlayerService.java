@@ -61,15 +61,15 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     public static MediaPlayerService mediaPlayerService;
     public static List<DataModel> albumList;
     private AudioAttributes playbackAttributes;
-    private boolean playbackNowAuthorized=true;
-    private boolean playbackDelayed=false;
-    private  AudioFocusRequest focusRequest;
-    private boolean resumeOnFocusGain=true;
+    private boolean playbackNowAuthorized = true;
+    private boolean playbackDelayed = false;
+    private AudioFocusRequest focusRequest;
+    private boolean resumeOnFocusGain = true;
     private MediaSession mediaSession;
     private MediaController mediaController;
     private NotificationBroadcastReceiver broadcastReceiver;
-    private final String focusLock="focusLock";
-    private boolean isPausePlayback=false;
+    private final String focusLock = "focusLock";
+    private boolean isPausePlayback = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -82,17 +82,16 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     public void onCreate() {
         super.onCreate();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                setupMediaSession();
-            }
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setupMediaSession();
+        }
 
 
     }
 
     public void requestFocus() {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if(audioManager !=null) {
+        if (audioManager != null) {
             int res = 0;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -104,7 +103,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                         AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
             }
-            synchronized(focusLock) {
+            synchronized (focusLock) {
                 if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
                     playbackNowAuthorized = false;
                 } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -119,12 +118,12 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void playbackNow() {
-        if(!isPausePlayback){
+        if (!isPausePlayback) {
             return;
         }
-        isPausePlayback=false;
-        if(SingleSongIntentService.getInstance().getMediaPlayer()!=null &&
-                !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
+        isPausePlayback = false;
+        if (SingleSongIntentService.getInstance().getMediaPlayer() != null &&
+                !SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()) {
 
             SingleSongIntentService.getInstance().resumeMusic(true);
         }
@@ -136,7 +135,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
         super.onDestroy();
         try {
             unregisterReceiver(broadcastReceiver);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -146,10 +145,10 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mediaPlayerService = this;
-        IntentFilter intentFilter=new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("pauseSong");
-        broadcastReceiver=new NotificationBroadcastReceiver();
-        registerReceiver(broadcastReceiver,intentFilter);
+        broadcastReceiver = new NotificationBroadcastReceiver();
+        registerReceiver(broadcastReceiver, intentFilter);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             playbackAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -167,10 +166,10 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
         Bitmap icon = BitmapFactory.decodeResource(getApplication().getResources(),
                 android.R.drawable.ic_media_play);
         if (Build.VERSION.SDK_INT >= 26) {
-            startForeground(1, getForeGroundNotification(0,"Buffering","","",icon));
+            startForeground(1, getForeGroundNotification(0, "Buffering", "", "", icon));
 
-        }else{
-            startForeground(1,getNotificationOngoing(0,"Buffering","....","",icon));
+        } else {
+            startForeground(1, getNotificationOngoing(0, "Buffering", "....", "", icon));
         }
 
         playSongAtPosition(positionToplay);
@@ -178,36 +177,37 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
         return START_STICKY;
     }
 
-    public void updateNotification(int time,String title,String text,String image,Bitmap icon) {
+    public void updateNotification(int time, String title, String text, String image, Bitmap icon) {
 
 
         Notification notification = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notification = getForeGroundNotification(time,title,text,image,icon);
+            notification = getForeGroundNotification(time, title, text, image, icon);
 
-        }else{
-            notification=getNotificationOngoing(time,title,text,image,icon);
+        } else {
+            notification = getNotificationOngoing(time, title, text, image, icon);
         }
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(mNotificationManager!=null){
+        if (mNotificationManager != null) {
             mNotificationManager.notify(1, notification);
         }
 
     }
-    public Notification getNotificationOngoing(int time,String title, String text, final String image,Bitmap playbtnIcon){
-        RemoteViews contentView = getContentView(title,text,image,playbtnIcon);
+
+    public Notification getNotificationOngoing(int time, String title, String text, final String image, Bitmap playbtnIcon) {
+        RemoteViews contentView = getContentView(title, text, image, playbtnIcon);
         Intent resultIntent = new Intent(this, PlayMusicActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
-        resultIntent.putExtra("intent",true);
-        resultIntent.putExtra("position",positionToplay);
-        resultIntent.putExtra("songLength",SingleSongIntentService.getInstance().songLength);
-        resultIntent.putExtra("songPlayed",time);
-        resultIntent.putExtra("title",title);
-        resultIntent.putExtra("description",text);
+        resultIntent.putExtra("intent", true);
+        resultIntent.putExtra("position", positionToplay);
+        resultIntent.putExtra("songLength", SingleSongIntentService.getInstance().songLength);
+        resultIntent.putExtra("songPlayed", time);
+        resultIntent.putExtra("title", title);
+        resultIntent.putExtra("description", text);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (Build.VERSION.SDK_INT >=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             return new Notification.Builder(this)
                     .setContentTitle(getString(R.string.app_name))
                     .setOngoing(true)
@@ -217,7 +217,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                     .setContent(contentView)
                     .setContentText(title)
                     .build();
-        }else {
+        } else {
             return new Notification.Builder(this)
                     .setContentTitle(getString(R.string.app_name))
                     .setOngoing(true)
@@ -232,20 +232,20 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
 
     }
 
-    public Notification getNotification(int time,String title, String text, final String image,Bitmap playbtnIcon){
-        RemoteViews contentView = getContentView(title,text,image,playbtnIcon);
+    public Notification getNotification(int time, String title, String text, final String image, Bitmap playbtnIcon) {
+        RemoteViews contentView = getContentView(title, text, image, playbtnIcon);
         Intent resultIntent = new Intent(this, PlayMusicActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        resultIntent.putExtra("intent",true);
-        resultIntent.putExtra("songLength",SingleSongIntentService.getInstance().songLength);
-        resultIntent.putExtra("title",title);
-        resultIntent.putExtra("songPlayed",time);
-        resultIntent.putExtra("position",positionToplay);
-        resultIntent.putExtra("description",text);
+        resultIntent.putExtra("intent", true);
+        resultIntent.putExtra("songLength", SingleSongIntentService.getInstance().songLength);
+        resultIntent.putExtra("title", title);
+        resultIntent.putExtra("songPlayed", time);
+        resultIntent.putExtra("position", positionToplay);
+        resultIntent.putExtra("description", text);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (Build.VERSION.SDK_INT >=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             return new Notification.Builder(this)
                     .setContentTitle(getString(R.string.app_name))
                     .setOngoing(false)
@@ -255,7 +255,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                     .setStyle(new Notification.MediaStyle().setMediaSession(mediaSession.getSessionToken()))
                     .setContentText(title)
                     .build();
-        }else {
+        } else {
             return new Notification.Builder(this)
                     .setContentTitle(getString(R.string.app_name))
                     .setOngoing(false)
@@ -278,12 +278,18 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onPlay() {
                 super.onPlay();
-                Intent pauseSong = new Intent("pauseSong");
-                Intent intentExtras=new Intent();
-                intentExtras.putExtra("title",albumList.get(positionToplay).getTitle());
-                intentExtras.putExtra("text",albumList.get(positionToplay).getDescription());
-                intentExtras.putExtra("positionSong",positionToplay+"");
-                intentExtras.putExtra("image",albumList.get(positionToplay).getSongUrl());
+                mediaSession.setPlaybackState(new PlaybackState.Builder()
+                        .setState(PlaybackState.STATE_PAUSED, 0, 0)
+
+                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                        .build());
+                Intent pauseSong =new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
+                pauseSong.setAction("pauseSong");
+                Intent intentExtras = new Intent();
+                intentExtras.putExtra("title", albumList.get(positionToplay).getTitle());
+                intentExtras.putExtra("text", albumList.get(positionToplay).getDescription());
+                intentExtras.putExtra("positionSong", positionToplay + "");
+                intentExtras.putExtra("image", albumList.get(positionToplay).getSongUrl());
                 pauseSong.putExtras(intentExtras);
                 sendBroadcast(pauseSong);
             }
@@ -291,12 +297,17 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onPause() {
                 super.onPause();
-                Intent pauseSong = new Intent("pauseSong");
-                Intent intentExtras=new Intent();
-                intentExtras.putExtra("title",albumList.get(positionToplay).getTitle());
-                intentExtras.putExtra("text",albumList.get(positionToplay).getDescription());
-                intentExtras.putExtra("positionSong",positionToplay+"");
-                intentExtras.putExtra("image",albumList.get(positionToplay).getSongUrl());
+                mediaSession.setPlaybackState(new PlaybackState.Builder()
+                        .setState(PlaybackState.STATE_PLAYING, 0, 0)
+                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                        .build());
+                Intent pauseSong = new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
+                pauseSong.setAction("pauseSong");
+                Intent intentExtras = new Intent();
+                intentExtras.putExtra("title", albumList.get(positionToplay).getTitle());
+                intentExtras.putExtra("text", albumList.get(positionToplay).getDescription());
+                intentExtras.putExtra("positionSong", positionToplay + "");
+                intentExtras.putExtra("image", albumList.get(positionToplay).getSongUrl());
                 pauseSong.putExtras(intentExtras);
                 sendBroadcast(pauseSong);
             }
@@ -305,13 +316,13 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onSkipToNext() {
                 super.onSkipToNext();
-                Intent pauseSong = new Intent(MediaPlayerService.this,NotificationBroadcastReceiver.class);
+                Intent pauseSong = new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
                 pauseSong.setAction("nextSong");
-                Intent intentExtras=new Intent();
-                intentExtras.putExtra("title",albumList.get(positionToplay).getTitle());
-                intentExtras.putExtra("text",albumList.get(positionToplay).getDescription());
-                intentExtras.putExtra("positionSong",positionToplay+"");
-                intentExtras.putExtra("image",albumList.get(positionToplay).getSongUrl());
+                Intent intentExtras = new Intent();
+                intentExtras.putExtra("title", albumList.get(positionToplay).getTitle());
+                intentExtras.putExtra("text", albumList.get(positionToplay).getDescription());
+                intentExtras.putExtra("positionSong", positionToplay + "");
+                intentExtras.putExtra("image", albumList.get(positionToplay).getSongUrl());
                 pauseSong.putExtras(intentExtras);
                 sendBroadcast(pauseSong);
             }
@@ -319,33 +330,34 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
             @Override
             public void onSkipToPrevious() {
                 super.onSkipToPrevious();
-                Intent pauseSong = new Intent(MediaPlayerService.this,NotificationBroadcastReceiver.class);
+                Intent pauseSong = new Intent(MediaPlayerService.this, NotificationBroadcastReceiver.class);
                 pauseSong.setAction("prevSong");
-                Intent intentExtras=new Intent();
-                intentExtras.putExtra("title",albumList.get(positionToplay).getTitle());
-                intentExtras.putExtra("text",albumList.get(positionToplay).getDescription());
-                intentExtras.putExtra("positionSong",positionToplay+"");
-                intentExtras.putExtra("image",albumList.get(positionToplay).getSongUrl());
+                Intent intentExtras = new Intent();
+                intentExtras.putExtra("title", albumList.get(positionToplay).getTitle());
+                intentExtras.putExtra("text", albumList.get(positionToplay).getDescription());
+                intentExtras.putExtra("positionSong", positionToplay + "");
+                intentExtras.putExtra("image", albumList.get(positionToplay).getSongUrl());
                 pauseSong.putExtras(intentExtras);
                 sendBroadcast(pauseSong);
             }
         });
 
-        mediaController=new MediaController(this,mediaSession.getSessionToken());
+        mediaController = new MediaController(this, mediaSession.getSessionToken());
         mediaSession.setPlaybackState(new PlaybackState.Builder()
-                .setState(PlaybackState.STATE_PLAYING, 0, 0)
-                .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                .setState(PlaybackState.STATE_PAUSED, 0, 0)
+                .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
                 .build());
 
         mediaSession.setActive(true);
     }
-    private RemoteViews getContentView(String title, String text, final String image,Bitmap playbtnIcon) {
+
+    private RemoteViews getContentView(String title, String text, final String image, Bitmap playbtnIcon) {
         final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification_layout);
         new RemoteViews(getPackageName(), R.layout.notification_layout);
         RequestOptions requestOptions = new RequestOptions();
-        contentView.setImageViewBitmap(R.id.playBtnNotification,playbtnIcon);
+        contentView.setImageViewBitmap(R.id.playBtnNotification, playbtnIcon);
         requestOptions = requestOptions.transforms(new CenterCrop());
-        requestOptions.override(100,100);
+        requestOptions.override(100, 100);
         Glide.with(getApplicationContext())
                 .asBitmap()
                 .apply(requestOptions)
@@ -356,49 +368,37 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                         contentView.setImageViewBitmap(R.id.image, resource);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             mediaSession.setMetadata(new MediaMetadata.Builder()
-                                    .putString(MediaMetadata.METADATA_KEY_ARTIST,albumList.get(positionToplay).getDescription() )
+                                    .putString(MediaMetadata.METADATA_KEY_ARTIST, albumList.get(positionToplay).getDescription())
                                     .putString(MediaMetadata.METADATA_KEY_ALBUM, "")
-                                    .putString(MediaMetadata.METADATA_KEY_TITLE,albumList.get(positionToplay).getTitle())
+                                    .putString(MediaMetadata.METADATA_KEY_TITLE, albumList.get(positionToplay).getTitle())
                                     .putLong(MediaMetadata.METADATA_KEY_DURATION, 10000)
-                                    .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART,resource)
+                                    .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, resource)
                                     //.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Test Artist")
                                     .build());
 
-                            if(PlayMusicViewModel.isBuffering){
+                            if (PlayMusicViewModel.isBuffering) {
                                 mediaSession.setPlaybackState(new PlaybackState.Builder()
                                         .setState(PlaybackState.STATE_BUFFERING, 0, 0)
-                                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                                        .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
                                         .build());
-                            }else {
-                                if(SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
-                                    mediaSession.setPlaybackState(new PlaybackState.Builder()
-                                            .setState(PlaybackState.STATE_PLAYING, 0, 0)
-                                            .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                                            .build());
-                                }else{
-                                    mediaSession.setPlaybackState(new PlaybackState.Builder()
-                                            .setState(PlaybackState.STATE_PAUSED, 0, 0)
-                                            .setActions(PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_NEXT|PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                                            .build());
-                                }
                             }
 
 
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Palette palette=Palette.generate(resource);
+                            Palette palette = Palette.generate(resource);
                             GradientDrawable gradientDrawable = new GradientDrawable(
-                                    GradientDrawable.Orientation.LEFT_RIGHT, new int[] {
-                                    palette.getDominantColor( getColor(R.color.black)),
-                                    palette.getDominantColor( getColor(R.color.black)),
-                                    palette.getDominantColor( getColor(R.color.black)),
-                                    palette.getDominantColor( getColor(R.color.black)),
+                                    GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
+                                    palette.getDominantColor(getColor(R.color.black)),
+                                    palette.getDominantColor(getColor(R.color.black)),
+                                    palette.getDominantColor(getColor(R.color.black)),
+                                    palette.getDominantColor(getColor(R.color.black)),
                                     getColor(R.color.transparent)});
-                            contentView.setInt(R.id.prevSongBtnNotification,"setColorFilter",  palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setInt(R.id.playBtnNotification,"setColorFilter",  palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setInt(R.id.nextSongBtnNotification,"setColorFilter",  palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setTextColor(R.id.title,palette.getLightVibrantColor(getColor(R.color.white)));
-                            contentView.setTextColor(R.id.text,palette.getLightVibrantColor(getColor(R.color.white)));
+                            contentView.setInt(R.id.prevSongBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
+                            contentView.setInt(R.id.playBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
+                            contentView.setInt(R.id.nextSongBtnNotification, "setColorFilter", palette.getLightVibrantColor(getColor(R.color.white)));
+                            contentView.setTextColor(R.id.title, palette.getLightVibrantColor(getColor(R.color.white)));
+                            contentView.setTextColor(R.id.text, palette.getLightVibrantColor(getColor(R.color.white)));
 
                             float dpi = getBaseContext().getResources().getDisplayMetrics().xdpi;
                             float dp = getBaseContext().getResources().getDisplayMetrics().density;
@@ -406,7 +406,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                             Bitmap bitmap = Bitmap.createBitmap(Math.round(288 * dp), Math.round(72 * dp), Bitmap.Config.ARGB_8888);
                             Canvas canvas = new Canvas(bitmap);
                             gradientDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                            gradientDrawable.setCornerRadius(5 * (dpi/160));
+                            gradientDrawable.setCornerRadius(5 * (dpi / 160));
                             gradientDrawable.draw(canvas);
                             contentView.setImageViewBitmap(R.id.bck_image, bitmap);
 //                            contentView.setInt(R.id.close,"setBackground",palette.getDominantColor( getColor(R.color.white)));
@@ -417,37 +417,36 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                 });
 
 
-        Intent intentExtras=new Intent();
-        intentExtras.putExtra("title",title);
-        intentExtras.putExtra("text",text);
-        intentExtras.putExtra("positionSong",positionToplay+"");
-        intentExtras.putExtra("image",image);
+        Intent intentExtras = new Intent();
+        intentExtras.putExtra("title", title);
+        intentExtras.putExtra("text", text);
+        intentExtras.putExtra("positionSong", positionToplay + "");
+        intentExtras.putExtra("image", image);
 
 
-        Intent closeButton = new Intent(this,NotificationBroadcastReceiver.class);
+        Intent closeButton = new Intent(this, NotificationBroadcastReceiver.class);
         closeButton.putExtras(intentExtras);
         closeButton.setAction("closeService");
 
-        Intent pauseSong = new Intent(this,NotificationBroadcastReceiver.class);
+        Intent pauseSong = new Intent(this, NotificationBroadcastReceiver.class);
         pauseSong.putExtras(intentExtras);
         pauseSong.setAction("pauseSong");
 
-        Intent nextSong = new Intent(this,NotificationBroadcastReceiver.class);
+        Intent nextSong = new Intent(this, NotificationBroadcastReceiver.class);
         nextSong.putExtras(intentExtras);
         nextSong.setAction("nextSong");
 
-        Intent prevSong = new Intent(this,NotificationBroadcastReceiver.class);
+        Intent prevSong = new Intent(this, NotificationBroadcastReceiver.class);
         prevSong.putExtras(intentExtras);
         prevSong.setAction("prevSong");
 
 
-
-        PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 0, pauseSong,  PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextSong,  PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingPrevIntent = PendingIntent.getBroadcast(this, 0, prevSong,  PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingCloseIntent = PendingIntent.getBroadcast(this, 0, closeButton,  PendingIntent.FLAG_UPDATE_CURRENT);
-        contentView.setTextViewText(R.id.title,title);
-        contentView.setTextViewText(R.id.text,text);
+        PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 0, pauseSong, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextSong, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingPrevIntent = PendingIntent.getBroadcast(this, 0, prevSong, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingCloseIntent = PendingIntent.getBroadcast(this, 0, closeButton, PendingIntent.FLAG_UPDATE_CURRENT);
+        contentView.setTextViewText(R.id.title, title);
+        contentView.setTextViewText(R.id.text, text);
 
         contentView.setOnClickPendingIntent(R.id.playBtnNotification, pendingSwitchIntent);
         contentView.setOnClickPendingIntent(R.id.nextSongBtnNotification, pendingNextIntent);
@@ -458,22 +457,20 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Notification getForeGroundNotification(int time,String title, String text, final String image,Bitmap playbtnIcon) {
-        RemoteViews contentView = getContentView(title,text,image,playbtnIcon);
+    public Notification getForeGroundNotification(int time, String title, String text, final String image, Bitmap playbtnIcon) {
+        RemoteViews contentView = getContentView(title, text, image, playbtnIcon);
         String CHANNEL_ID = "my_channel_01";
         Intent resultIntent = new Intent(this, PlayMusicActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
-        resultIntent.putExtra("intent",true);
-        resultIntent.putExtra("title",title);
-        resultIntent.putExtra("songPlayed",time);
-        resultIntent.putExtra("songLength",SingleSongIntentService.getInstance().songLength);
-        resultIntent.putExtra("position",positionToplay);
-        resultIntent.putExtra("description",text);
+        resultIntent.putExtra("intent", true);
+        resultIntent.putExtra("title", title);
+        resultIntent.putExtra("songPlayed", time);
+        resultIntent.putExtra("songLength", SingleSongIntentService.getInstance().songLength);
+        resultIntent.putExtra("position", positionToplay);
+        resultIntent.putExtra("description", text);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
 
 
         return new Notification.Builder(this, CHANNEL_ID)
@@ -490,7 +487,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
 
 
     public void playSongAtPosition(final int position) {
-        positionToplay=position;
+        positionToplay = position;
         SingleSongIntentService.getInstance().playSong(position, albumList.get(position).getSongUrl());
 
 
@@ -508,7 +505,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 if (playbackDelayed || resumeOnFocusGain) {
-                    synchronized(focusLock) {
+                    synchronized (focusLock) {
                         playbackDelayed = false;
                         resumeOnFocusGain = false;
                     }
@@ -516,14 +513,14 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                synchronized(focusLock) {
+                synchronized (focusLock) {
                     resumeOnFocusGain = false;
                     playbackDelayed = false;
                 }
                 pausePlayback();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                synchronized(focusLock) {
+                synchronized (focusLock) {
                     resumeOnFocusGain = true;
                     playbackDelayed = false;
                 }
@@ -536,8 +533,8 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void pausePlayback() {
-        if(SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()){
-            isPausePlayback=true;
+        if (SingleSongIntentService.getInstance().getMediaPlayer().isPlaying()) {
+            isPausePlayback = true;
             SingleSongIntentService.getInstance().pauseMusic();
         }
 

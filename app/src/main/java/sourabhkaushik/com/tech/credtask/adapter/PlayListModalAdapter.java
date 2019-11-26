@@ -1,7 +1,11 @@
 package sourabhkaushik.com.tech.credtask.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -159,10 +164,33 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
             circularProgressDrawable.start();
             RequestOptions requestOptions = new RequestOptions();
             requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
-            Glide.with(binding.getRoot().getContext())
-                    .load(data.get(position)
-                            .getImage()).placeholder(circularProgressDrawable).apply(requestOptions)
-                    .into(binding.songConver);
+
+
+            if(data.get(position)
+                    .getImage().contains("http://")||data.get(position).getImage().contains("https://")){
+                Glide.with(binding.getRoot().getContext()).load(data.get(position)
+                        .getImage()).apply(requestOptions).into(binding.songConver);
+            }else {
+
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                byte[] rawArt;
+                Bitmap art;
+                BitmapFactory.Options bfo=new BitmapFactory.Options();
+                Uri uri= Uri.fromFile(new File(data.get(position)
+                        .getImage()));
+                mmr.setDataSource(binding.getRoot().getContext(), uri);
+                rawArt = mmr.getEmbeddedPicture();
+                if (null != rawArt){
+                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                    Glide.with(binding.getRoot().getContext()).load(art).apply(requestOptions).into(binding.songConver);
+                }
+
+            }
+
+//            Glide.with(binding.getRoot().getContext())
+//                    .load(data.get(position)
+//                            .getImage()).placeholder(circularProgressDrawable).apply(requestOptions)
+//                    .into(binding.songConver);
 
             binding.titleDescrption.setText(data.get(position).getDescription());
             binding.isPlaying.setVisibility(position== MediaPlayerService.positionToplay?View.VISIBLE:View.GONE);

@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import sourabhkaushik.com.tech.credtask.MainApplication;
+import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.interfaces.MediaPlayerInterfaceInstance;
 import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
@@ -82,7 +83,10 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                 mediaPlayer.release();
             }
         }
-        if (handler != null && runnable != null && isHandlerAttached) {
+        if (handler != null
+                &&
+                runnable != null
+                && isHandlerAttached) {
             handler.removeCallbacks(runnable);
             isHandlerAttached = false;
         }
@@ -131,7 +135,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                             MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
                             MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
                             BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
-                                    android.R.drawable.ic_media_pause)
+                                    R.drawable.pause_black)
                     ));
                 }
             }
@@ -158,7 +162,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                                 MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
                                 MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
                                 BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
-                                        android.R.drawable.ic_media_pause)
+                                        R.drawable.pause_black)
                         ));
             }else{
                 MediaPlayerService.mediaPlayerService.getNotificationOngoing(
@@ -167,7 +171,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                         MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription(),
                         MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage(),
                         BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
-                                android.R.drawable.ic_media_pause)
+                                R.drawable.pause_black)
                 );
             }
             if(!isAudioFocus){
@@ -180,7 +184,9 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     void setMusicToSec(int seekBarPerc) {
 
         if (mediaPlayer != null) {
-            if (isHandlerAttached) {
+            if (isHandlerAttached
+
+            &&(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://"))) {
                 handler.removeCallbacks(runnable);
                 isHandlerAttached = false;
             }
@@ -275,7 +281,8 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     public boolean onInfo(MediaPlayer mediaPlayer, int what, int extra) {
         switch (what) {
             case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                if (isHandlerAttached) {
+                if (isHandlerAttached
+                &&(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://"))) {
                     handler.removeCallbacks(runnable);
                     isHandlerAttached = false;
                 }

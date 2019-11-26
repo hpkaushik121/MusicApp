@@ -67,8 +67,11 @@
                     <TextView
                         android:id="@+id/songName"
                         android:layout_width="wrap_content"
+                        android:maxLines="1"
+                        android:maxWidth="@dimen/dimen_300"
                         android:layout_height="wrap_content"
                         android:text="Song Name"
+                        android:ellipsize="end"
                         android:textColor="@color/white"
                         android:textSize="@dimen/dimen_30"
                         android:textStyle="bold" />
@@ -76,6 +79,9 @@
                     <TextView
                         android:id="@+id/singerName"
                         android:layout_width="wrap_content"
+                        android:maxWidth="@dimen/dimen_300"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:layout_height="wrap_content"
                         android:text="Singer Name"
                         android:textColor="@color/white"

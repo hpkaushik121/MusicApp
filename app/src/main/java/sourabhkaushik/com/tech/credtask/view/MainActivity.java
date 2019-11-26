@@ -21,7 +21,9 @@
  */
 package sourabhkaushik.com.tech.credtask.view;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -36,6 +38,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -60,6 +63,7 @@ import sourabhkaushik.com.tech.credtask.viewmodel.DataViewModel;
  * Created by Gregory Rasmussen on 7/26/17.
  */
 public class MainActivity extends AppCompatActivity implements RequestListener {
+    private static final int REQUEST_WRITE_PERMISSION = 99;
     private DataViewModel dataViewModel;
     public static boolean isInForground = false;
     private ActivityMainBinding binding;
@@ -69,9 +73,34 @@ public class MainActivity extends AppCompatActivity implements RequestListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = bind();
+//        requestPermission();
 
+        bind();
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[]
+            permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_WRITE_PERMISSION:
+                if (grantResults.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    // check whether storage permission granted or not.
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        //do what you want;
+                        bind();
+                    }else {
+                        System.exit(1);
+                    }
+                }else {
+                    bind();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -97,6 +126,14 @@ public class MainActivity extends AppCompatActivity implements RequestListener {
         isInForground = false;
     }
 
+//    private void requestPermission() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            requestPermissions(new String[] {
+//                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
+//        } else {
+//            bind();
+//        }
+//    }
     private View bind() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
