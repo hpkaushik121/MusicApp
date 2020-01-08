@@ -18,7 +18,6 @@ import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
  * Created by Sourabh kaushik on 11/7/2019.
  */
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
-    private static Boolean ispaused = false;
 
 
     @Override
@@ -31,8 +30,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                         AppUtils.showToast("buffering is in progress");
                         return;
                     }
-                    if (!ispaused) {
-                        ispaused = true;
+                    if (PlayMusicViewModel.isPlaying) {
+                        PlayMusicViewModel.isPlaying = false;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             MediaPlayerService.mediaSession.setPlaybackState(new PlaybackState.Builder()
                                     .setState(PlaybackState.STATE_PAUSED, 0, 0)
@@ -40,18 +39,20 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                                     .build());
                         }
                         if (!PlayMusicActivity.isInForground) {
-                            String title = intent.getStringExtra("title");
-                            String text = intent.getStringExtra("text");
-                            int time = intent.getIntExtra("songPlayed",0);
-                            String image = intent.getStringExtra("image");
+                            String title = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle();
+                            String text = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription();
+                            int time = SingleSongIntentService.getInstance().time;
+                            String image = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage();
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
                                     R.drawable.arrow_play));
                         }
 
 
                         SingleSongIntentService.getInstance().pauseMusic();
+
+
                     } else {
-                        ispaused = false;
+                        PlayMusicViewModel.isPlaying = true;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             MediaPlayerService.mediaSession.setPlaybackState(new PlaybackState.Builder()
                                     .setState(PlaybackState.STATE_PLAYING, 0, 0)
@@ -59,10 +60,10 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                                     .build());
                         }
                         if (!PlayMusicActivity.isInForground) {
-                            String title = intent.getStringExtra("title");
-                            String text = intent.getStringExtra("text");
-                            int time = intent.getIntExtra("songPlayed",0);
-                            String image = intent.getStringExtra("image");
+                            String title = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle();
+                            String text = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription();
+                            int time = SingleSongIntentService.getInstance().time;
+                            String image = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage();
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
                                     R.drawable.arrow_play));
                         }
@@ -75,16 +76,14 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                     if (PlayMusicActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().nextMusic();
                     } else {
-                        int position = Integer.parseInt(intent.getStringExtra("positionSong"));
 
-
-                        if (position < MediaPlayerService.albumList.size() - 1) {
-                            ++position;
-                            String title = MediaPlayerService.albumList.get(position).getTitle();
-                            String text = MediaPlayerService.albumList.get(position).getDescription();
-                            String image = MediaPlayerService.albumList.get(position).getImage();
+                        if (MediaPlayerService.positionToplay < MediaPlayerService.albumList.size() - 1) {
+                            ++MediaPlayerService.positionToplay;
+                            String title = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle();
+                            String text = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription();
+                            String image = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage();
                             int time = 0;
-                            MediaPlayerService.mediaPlayerService.playSongAtPosition(position);
+                            MediaPlayerService.mediaPlayerService.playSongAtPosition(MediaPlayerService.positionToplay);
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
                                     R.drawable.arrow_play));
                         }
@@ -97,14 +96,14 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                     if (PlayMusicActivity.isInForground) {
                         MediaPlayerInterfaceInstance.getInstance().getMpinterface().prevMusic();
                     } else {
-                        int position = Integer.parseInt(intent.getStringExtra("positionSong"));
-                        if (position > 0) {
-                            --position;
-                            String title = MediaPlayerService.albumList.get(position).getTitle();
-                            String text = MediaPlayerService.albumList.get(position).getDescription();
-                            String image = MediaPlayerService.albumList.get(position).getImage();
+
+                        if (MediaPlayerService.positionToplay > 0) {
+                            --MediaPlayerService.positionToplay;
+                            String title = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle();
+                            String text = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription();
+                            String image = MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage();
                             int time = 0;
-                            MediaPlayerService.mediaPlayerService.playSongAtPosition(position);
+                            MediaPlayerService.mediaPlayerService.playSongAtPosition(MediaPlayerService.positionToplay);
                             MediaPlayerService.mediaPlayerService.updateNotification(time,title, text, image, BitmapFactory.decodeResource(context.getResources(),
                                     R.drawable.arrow_play));
                         }

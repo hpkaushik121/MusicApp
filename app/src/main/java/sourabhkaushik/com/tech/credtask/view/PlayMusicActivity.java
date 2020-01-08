@@ -16,6 +16,7 @@ import android.view.animation.AnimationUtils;
 import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.databinding.ActivityPlayMusicBinding;
 import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
+import sourabhkaushik.com.tech.credtask.services.MediaPlayerService;
 import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
 
 public class PlayMusicActivity extends AppCompatActivity  {
@@ -26,6 +27,10 @@ public class PlayMusicActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(MediaPlayerService.albumList.size()==0){
+            onBackPressed();
+            return;
+        }
         binding= DataBindingUtil.setContentView(this,R.layout.activity_play_music);
 
         binding.setPlayMusicViewModel(new PlayMusicViewModel(this));
@@ -87,15 +92,6 @@ public class PlayMusicActivity extends AppCompatActivity  {
                 manager.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
             }
             return;
-        }else{
-            if(getIntent().hasExtra("intent")){
-                Intent intent=new Intent(this,MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        |Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return;
-            }
         }
 
         super.onBackPressed();

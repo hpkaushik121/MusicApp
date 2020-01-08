@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class DummyAlbumAdapter extends RecyclerView.Adapter<DummyAlbumAdapter.Du
     public DataViewModel dataViewModel;
     private Context mContext;
     private int listPosition;
+    private RequestOptions requestOptions;
     public DummyAlbumAdapter(DataViewModel model,int lstPosition) {
         albums=new ArrayList<>();
         this.listPosition=lstPosition;
@@ -60,24 +62,15 @@ public class DummyAlbumAdapter extends RecyclerView.Adapter<DummyAlbumAdapter.Du
         circularProgressDrawable.setStrokeWidth( 5f);
         circularProgressDrawable.setCenterRadius(30f);
         circularProgressDrawable.start();
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
+        requestOptions = new RequestOptions()
+                .transforms(new CenterCrop(), new RoundedCorners(16));
+
 
         if(album.getCoverImage().contains("http://")||album.getCoverImage().contains("https://")){
-            Glide.with(mContext).load(album.getCoverImage()).placeholder(circularProgressDrawable).apply(requestOptions).into(holder.binding.coverImage);
+            Glide.with(mContext).load(album.getCoverImage()).apply(requestOptions).into(holder.binding.coverImage);
         }else {
 
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            byte[] rawArt;
-            Bitmap art;
-            BitmapFactory.Options bfo=new BitmapFactory.Options();
-            Uri uri= Uri.fromFile(new File(album.getCoverImage()));
-            mmr.setDataSource(mContext, uri);
-            rawArt = mmr.getEmbeddedPicture();
-            if (null != rawArt){
-                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-                Glide.with(mContext).load(art).placeholder(circularProgressDrawable).apply(requestOptions).into(holder.binding.coverImage);
-            }
+            new setImage().execute(album.getCoverImage(),holder);
 
         }
         holder.bind(dataViewModel,album,position);
@@ -90,6 +83,36 @@ public class DummyAlbumAdapter extends RecyclerView.Adapter<DummyAlbumAdapter.Du
     public void updateData(@Nullable List<Album> data) {
         this.albums=data;
         notifyDataSetChanged();
+    }
+
+    private class setImage extends AsyncTask<Object,String,Bitmap> {
+        private DummAlbumViewHolder viewHolder;
+
+        @Override
+        protected Bitmap doInBackground(Object... objects) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            byte[] rawArt;
+            Bitmap art=null;
+            BitmapFactory.Options bfo=new BitmapFactory.Options();
+            Uri uri= Uri.fromFile(new File((String) objects[0]));
+            viewHolder= (DummAlbumViewHolder) objects[1];
+            mmr.setDataSource(mContext, uri);
+            rawArt = mmr.getEmbeddedPicture();
+            if (null != rawArt){
+                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+
+            }
+            return art;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+                Glide.with(mContext).load(bitmap).error(R.drawable.music_placeholder).placeholder(R.drawable.music_placeholder).apply(requestOptions).into(viewHolder.binding.coverImage);
+
+
+        }
     }
 
     public class DummAlbumViewHolder extends RecyclerView.ViewHolder{

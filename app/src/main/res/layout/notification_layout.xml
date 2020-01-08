@@ -5,7 +5,6 @@
     android:layout_height="100dp">
 
     <ImageView
-        android:src="@drawable/dummy"
         android:id="@+id/image"
         android:layout_width="@dimen/dimen_100"
         android:layout_height="@dimen/dimen_100"

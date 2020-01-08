@@ -44,7 +44,6 @@
         <ImageView
             android:layout_width="80dp"
             android:id="@+id/imageBanner"
-            android:src="@drawable/dummy"
             android:layout_marginLeft="@dimen/dimen_30"
             android:layout_marginTop="@dimen/dimen_20"
             android:elevation="@dimen/dimen_100"

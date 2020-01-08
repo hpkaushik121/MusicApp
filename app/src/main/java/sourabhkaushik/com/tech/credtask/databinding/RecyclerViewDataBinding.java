@@ -23,6 +23,7 @@ package sourabhkaushik.com.tech.credtask.databinding;
 
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import java.util.List;
 
@@ -30,11 +31,8 @@ import sourabhkaushik.com.tech.credtask.adapter.DataAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.DummyAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.DummyAlbumAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.PlayListAdapter;
-import sourabhkaushik.com.tech.credtask.adapter.PlayListModalAdapter;
 import sourabhkaushik.com.tech.credtask.model.Album;
-import sourabhkaushik.com.tech.credtask.model.AlbumListModel;
 import sourabhkaushik.com.tech.credtask.model.DataModel;
-import sourabhkaushik.com.tech.credtask.model.PlayListModel;
 
 /**
  * Created by Gregory Rasmussen on 7/26/17.
@@ -60,7 +58,7 @@ public class RecyclerViewDataBinding {
     }
 
     @BindingAdapter({"app:playListAdapter", "app:playListData"})
-    public static void bind(RecyclerView recyclerView, PlayListAdapter dummyAdapter, List<DataModel> dummyData) {
+    public static void bind(ViewPager recyclerView, PlayListAdapter dummyAdapter, List<DataModel> dummyData) {
         recyclerView.setAdapter(dummyAdapter);
         dummyAdapter.updateData(dummyData);
     }

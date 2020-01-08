@@ -55,7 +55,6 @@
     </androidx.cardview.widget.CardView>
         <ImageView
             android:layout_width="@dimen/dimen_170"
-            android:src="@drawable/dummy"
             android:layout_marginTop="5dp"
             android:id="@+id/coverImage"
             android:elevation="@dimen/dimen_15"

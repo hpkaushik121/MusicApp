@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
     private List<DataModel> data;
     private DataViewModel dataViewModel;
     private Context context;
+    private RequestOptions requestOptions;
     public DataAdapter(DataViewModel model) {
 
         this.dataViewModel=model;
@@ -80,23 +82,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
         circularProgressDrawable.setStrokeWidth( 5f);
         circularProgressDrawable.setCenterRadius(30f);
         circularProgressDrawable.start();
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
+        requestOptions = new RequestOptions()
+                .transforms(new CenterCrop(), new RoundedCorners(16));
         if(dataModel.getImage().contains("http://")||dataModel.getImage().contains("https://")){
-            Glide.with(context).load(dataModel.getImage()).placeholder(circularProgressDrawable).apply(requestOptions).into(holder.binding.imageBanner);
+            Glide.with(context).load(dataModel.getImage()).apply(requestOptions).into(holder.binding.imageBanner);
         }else {
-
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            byte[] rawArt;
-            Bitmap art;
-            BitmapFactory.Options bfo=new BitmapFactory.Options();
-            Uri uri= Uri.fromFile(new File(dataModel.getImage()));
-            mmr.setDataSource(context, uri);
-            rawArt = mmr.getEmbeddedPicture();
-            if (null != rawArt){
-                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-                Glide.with(context).load(art).placeholder(circularProgressDrawable).apply(requestOptions).into(holder.binding.imageBanner);
-            }
+            new setImage().execute(dataModel.getImage(),holder);
 
         }
 
@@ -117,6 +108,35 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
             this.data.addAll(data);
         }
         notifyDataSetChanged();
+    }
+    private class setImage extends AsyncTask<Object,String,Bitmap> {
+        private DataViewHolder viewHolder;
+
+        @Override
+        protected Bitmap doInBackground(Object... objects) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            byte[] rawArt;
+            Bitmap art=null;
+            BitmapFactory.Options bfo=new BitmapFactory.Options();
+            Uri uri= Uri.fromFile(new File((String) objects[0]));
+            viewHolder= (DataViewHolder) objects[1];
+            mmr.setDataSource(context, uri);
+            rawArt = mmr.getEmbeddedPicture();
+            if (null != rawArt){
+                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+
+            }
+            return art;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+                Glide.with(context).load(bitmap).error(R.drawable.music_placeholder).placeholder(R.drawable.music_placeholder).apply(requestOptions).into(viewHolder.binding.imageBanner);
+
+
+        }
     }
 
     static class DataViewHolder extends RecyclerView.ViewHolder {

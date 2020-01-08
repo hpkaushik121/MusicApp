@@ -12,14 +12,12 @@
             name="dataModel"
             type="sourabhkaushik.com.tech.credtask.model.DataModel" />
     </data>
-
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:id="@+id/coverImage"
-    android:src="@drawable/background_jocker"
-    android:scaleType="centerCrop"
-    android:layout_width="250dp"
-    android:layout_height="300dp">
-
-</ImageView>
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/coverImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/music_placeholder"
+        android:visibility="visible"/>
 </layout>

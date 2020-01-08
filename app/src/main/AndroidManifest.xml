@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <application
         android:name=".MainApplication"
@@ -18,8 +19,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:screenOrientation="portrait"
+            android:parentActivityName=".view.MainActivity"
             android:name=".view.PlayMusicActivity"></activity>
-        <activity android:screenOrientation="portrait" android:name=".view.MainActivity">
+        <activity android:screenOrientation="portrait"   android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

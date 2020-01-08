@@ -144,12 +144,16 @@ public class RippleBackground extends RelativeLayout {
                 rippleView.setVisibility(View.VISIBLE);
             }
             animatorSet.start();
+
             animationRunning=true;
         }
     }
 
     public void stopRippleAnimation(){
         if(isRippleAnimationRunning()){
+            for(RippleView rippleView:rippleViewList){
+                rippleView.setVisibility(View.GONE);
+            }
             animatorSet.end();
             animationRunning=false;
         }

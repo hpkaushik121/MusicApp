@@ -14,12 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/background"
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPagerbackground"
             android:layout_width="match_parent"
+            android:focusable="false"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/dummy_blur" />
+            app:playListAdapter="@{playMusicViewModel.playListAdapter}"
+            app:playListData="@{playMusicViewModel.dataModels}"
+            android:layout_gravity="center" />
         <FrameLayout
             android:layout_width="match_parent"
             android:id="@+id/playListFragment"
@@ -47,15 +49,17 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/playList"
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewpagerTop"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_height="@dimen/dimen_300"
+                    android:layout_centerInParent="true"
+                    android:clipToPadding="false"
+                    android:paddingLeft="50dp"
+                    android:paddingRight="50dp"
                     app:playListAdapter="@{playMusicViewModel.playListAdapter}"
                     app:playListData="@{playMusicViewModel.dataModels}"
-                    tools:listitem="@layout/play_list_item_layout" />
+                    android:layout_gravity="center" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -101,7 +105,7 @@
                         android:layout_gravity="start"
                         android:layout_marginLeft="@dimen/dimen_10"
                         android:padding="@dimen/dimen_5"
-                        android:text="05:22"
+                        android:text="00:00"
                         android:textAlignment="textStart"
                         android:textColor="@color/white" />
 
@@ -112,13 +116,15 @@
                         android:layout_gravity="end"
                         android:layout_marginRight="@dimen/dimen_10"
                         android:padding="@dimen/dimen_5"
-                        android:text="05:22"
+                        android:text="00:00"
                         android:textAlignment="textEnd"
                         android:textColor="@color/white" />
                 </LinearLayout>
 
                 <SeekBar
                     android:id="@+id/seekBar"
+                    android:min="0"
+                    android:max="100"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

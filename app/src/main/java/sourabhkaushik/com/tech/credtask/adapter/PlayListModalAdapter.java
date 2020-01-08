@@ -6,10 +6,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -25,6 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,72 +47,57 @@ import sourabhkaushik.com.tech.credtask.viewmodel.PlayMusicViewModel;
  * Created by Sourabh kaushik on 11/16/2019.
  */
 public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAdapter.GenericAdapter> implements PlayListTouchHelperAdapter.ItemTouchHelperContract{
-    private List<DataModel> data;
-    private PlayListViewModel playListViewModel;
-    public GenericAdapter holder;
 
-    public PlayListModalAdapter(List<DataModel> data, PlayListViewModel playListViewModel) {
-        this.data = data;
+    private PlayListViewModel playListViewModel;
+    private Context context;
+    private RequestOptions requestOptions;
+
+    public PlayListModalAdapter( PlayListViewModel playListViewModel) {
         this.playListViewModel = playListViewModel;
+
     }
 
     @NonNull
     @Override
     public GenericAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context=parent.getContext();
+        requestOptions = new RequestOptions()
+                .transforms(new CenterCrop(), new RoundedCorners(16));
         return new GenericAdapter(LayoutInflater.from(parent.getContext()).inflate(R.layout.play_list_modal_adapter,parent,false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull GenericAdapter holder, int position) {
-        this.holder=holder;
         holder.bind(position);
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return MediaPlayerService.albumList.size();
     }
 
     @Override
     public void onRowMoved(int fromPosition, int toPosition) {
-        DataModel dataModel=data.get(MediaPlayerService.positionToplay);
+        DataModel dataModel=MediaPlayerService.albumList.get(MediaPlayerService.positionToplay);
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(data, i, i + 1);
+                Collections.swap(MediaPlayerService.albumList, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(data, i, i - 1);
+                Collections.swap(MediaPlayerService.albumList, i, i - 1);
             }
         }
-        MediaPlayerService.positionToplay=data.indexOf(dataModel);
 
-//        if(fromPosition==MediaPlayerService.positionToplay){
-//            MediaPlayerService.positionToplay=toPosition;
-//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-//            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-//                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
-//            notifyItemMoved(fromPosition, toPosition);
-//        }
-//        else if(toPosition<=MediaPlayerService.positionToplay){
-//            if(fromPosition>MediaPlayerService.positionToplay){
-//                MediaPlayerService.positionToplay++;
-//            }
-//
-//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-//            MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-//                    .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),MediaPlayerService.positionToplay);
-//            notifyItemMoved(fromPosition, toPosition);
-//        }else {
-//            Type listType = new TypeToken<List<DataModel>>() {}.getType();
-//
-//        }
+        notifyItemMoved(fromPosition, toPosition);
+        int pos=MediaPlayerService.albumList.indexOf(dataModel);
+        playListViewModel.prevPosition=MediaPlayerService.positionToplay=pos;
         Type listType = new TypeToken<List<DataModel>>() {}.getType();
         MediaPlayerInterfaceInstance.getInstance().getMpinterface()
-                .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),toPosition);
-        notifyItemMoved(fromPosition, toPosition);
+                .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(MediaPlayerService.albumList),listType));
 
     }
+
 
     @Override
     public void onRowSelected(GenericAdapter myViewHolder) {
@@ -135,15 +123,43 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
             return;
 
         }
-        DataModel dataModel=data.get(MediaPlayerService.positionToplay);
-        data.remove(position);
-        MediaPlayerService.positionToplay=data.indexOf(dataModel);
+        DataModel dataModel=MediaPlayerService.albumList.get(MediaPlayerService.positionToplay);
+        MediaPlayerService.albumList.remove(position);
+        MediaPlayerService.positionToplay=MediaPlayerService.albumList.indexOf(dataModel);
         Type listType = new TypeToken<List<DataModel>>() {}.getType();
         MediaPlayerInterfaceInstance
                 .getInstance()
                 .getMpinterface()
-                .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(data),listType),position);
+                .onPositionChange((List<DataModel>) new Gson().fromJson(new Gson().toJson(MediaPlayerService.albumList),listType));
         notifyItemRemoved(position);
+    }
+    private class setImage extends AsyncTask<Object,String,Bitmap> {
+        private ImageView viewHolder;
+
+        @Override
+        protected Bitmap doInBackground(Object... objects) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            byte[] rawArt;
+            Bitmap art=null;
+            BitmapFactory.Options bfo=new BitmapFactory.Options();
+            Uri uri= Uri.fromFile(new File((String) objects[0]));
+            viewHolder= (ImageView) objects[1];
+            mmr.setDataSource(context, uri);
+            rawArt = mmr.getEmbeddedPicture();
+            if (null != rawArt){
+                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+
+            }
+            return art;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+                Glide.with(context).load(bitmap).error(R.drawable.music_placeholder).placeholder(R.drawable.music_placeholder).apply(requestOptions).into(viewHolder);
+
+
+        }
     }
 
 
@@ -164,42 +180,16 @@ public class PlayListModalAdapter extends  RecyclerView.Adapter<PlayListModalAda
         public void bind(Integer position){
             binding.setPosition(position);
             binding.setPlayListViewModel(playListViewModel);
-            binding.title.setText(data.get(position).getTitle());
-            CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(binding.getRoot().getContext());
-            circularProgressDrawable.setStrokeWidth( 5f);
-            circularProgressDrawable.setCenterRadius(30f);
-            circularProgressDrawable.start();
-            RequestOptions requestOptions = new RequestOptions();
-            requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
+            binding.title.setText(MediaPlayerService.albumList.get(position).getTitle());
 
-
-            if(data.get(position)
-                    .getImage().contains("http://")||data.get(position).getImage().contains("https://")){
-                Glide.with(binding.getRoot().getContext()).load(data.get(position)
+            if(MediaPlayerService.albumList.get(position)
+                    .getImage().contains("http://")||MediaPlayerService.albumList.get(position).getImage().contains("https://")){
+                Glide.with(binding.getRoot().getContext()).load(MediaPlayerService.albumList.get(position)
                         .getImage()).apply(requestOptions).into(binding.songConver);
             }else {
-
-                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-                byte[] rawArt;
-                Bitmap art;
-                BitmapFactory.Options bfo=new BitmapFactory.Options();
-                Uri uri= Uri.fromFile(new File(data.get(position)
-                        .getImage()));
-                mmr.setDataSource(binding.getRoot().getContext(), uri);
-                rawArt = mmr.getEmbeddedPicture();
-                if (null != rawArt){
-                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-                    Glide.with(binding.getRoot().getContext()).load(art).apply(requestOptions).into(binding.songConver);
-                }
-
+                new setImage().execute(MediaPlayerService.albumList.get(position).getImage(),binding.songConver);
             }
-
-//            Glide.with(binding.getRoot().getContext())
-//                    .load(data.get(position)
-//                            .getImage()).placeholder(circularProgressDrawable).apply(requestOptions)
-//                    .into(binding.songConver);
-
-            binding.titleDescrption.setText(data.get(position).getDescription());
+            binding.titleDescrption.setText(MediaPlayerService.albumList.get(position).getDescription());
             binding.isPlaying.setVisibility(position== MediaPlayerService.positionToplay?View.VISIBLE:View.GONE);
             binding.setPosition(position);
         }

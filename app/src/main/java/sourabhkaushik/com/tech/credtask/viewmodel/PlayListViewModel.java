@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -53,6 +54,7 @@ import sourabhkaushik.com.tech.credtask.R;
 import sourabhkaushik.com.tech.credtask.Utils.AppUtils;
 import sourabhkaushik.com.tech.credtask.adapter.PlayListModalAdapter;
 import sourabhkaushik.com.tech.credtask.adapter.PlayListTouchHelperAdapter;
+import sourabhkaushik.com.tech.credtask.boommenu.Util;
 import sourabhkaushik.com.tech.credtask.databinding.PlayListLayoutBinding;
 import sourabhkaushik.com.tech.credtask.fragments.PlayListFragment;
 import sourabhkaushik.com.tech.credtask.interfaces.ListPlayingInterface;
@@ -68,13 +70,11 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 public class PlayListViewModel extends BaseObservable implements ListPlayingInterface {
 
     public int prevPosition=MediaPlayerService.positionToplay;
-    private Application application;
     private PlayListLayoutBinding playListLayoutBinding;
     private int prevYaxis;
     private int _yDelta;
     private float scaleImage = 0.17f;
     private float alpha = 1f;
-    private int Y = 0;
     private PlayListFragment playListFragment;
     public PlayListModalAdapter adapter;
 
@@ -82,7 +82,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
 
         this.playListFragment=fragment;
 
-        adapter=new PlayListModalAdapter(MediaPlayerService.albumList,this);
+        adapter=new PlayListModalAdapter(this);
 
     }
 
@@ -105,7 +105,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
 
             Glide.with(MainApplication.getAppContext())
                     .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                    .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                    .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
                     .into(playListLayoutBinding.plBgImage);
 
             Glide.with(MainApplication.getAppContext())
@@ -125,7 +125,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
                 art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
                 Glide.with(MainApplication.getAppContext())
                         .load(art)
-                        .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                        .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
                         .into(playListLayoutBinding.plBgImage);
 
                 Glide.with(MainApplication.getAppContext())
@@ -259,9 +259,16 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
         fromImage.startAnimation(animSet);
     }
 
-    public void onItemClickFromList(Integer position){
+    public void onItemClickFromList(final Integer position){
+        playListLayoutBinding.getPlayMusicViewModel().customViewPagerTop.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                playListLayoutBinding.getPlayMusicViewModel().customViewPagerTop.setCurrentItem(position);
+                playListLayoutBinding.getPlayMusicViewModel().onPageSelected(position);
+                playListLayoutBinding.getPlayMusicViewModel().onPageScrollStateChanged(0);
+            }
+        },100);
 
-        playListLayoutBinding.getPlayMusicViewModel().layoutManager.scrollToPosition(position);
         onSwipDown(400);
 
     }
@@ -274,7 +281,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
                 if(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://")){
                     Glide.with(MainApplication.getAppContext())
                             .load(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage())
-                            .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                            .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
                             .into(playListLayoutBinding.plBgImage);
 
                     Glide.with(MainApplication.getAppContext())
@@ -293,7 +300,7 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
                         art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
                         Glide.with(MainApplication.getAppContext())
                                 .load(art)
-                                .apply(bitmapTransform(new BlurTransformation(45, 12)))
+                                .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
                                 .into(playListLayoutBinding.plBgImage);
 
                         Glide.with(MainApplication.getAppContext())

@@ -94,7 +94,6 @@ import sourabhkaushik.com.tech.credtask.view.PlayMusicActivity;
 public class DataViewModel extends BaseObservable implements CardStackListener {
     public DataAdapter adapter;
     private DummyAdapter dummyAdapter;
-    public List<DataModel> data;
     private List<Album> dummyData;
     private View view;
     private int currentSongPosition = -1;
@@ -116,7 +115,6 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
     };
 
     public DataViewModel(View view, Activity act) {
-        data = new ArrayList<>();
         dummyData = new ArrayList<>();
         activity = act;
         listener = (RequestListener) act;
@@ -168,7 +166,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     @Bindable
     public List<DataModel> getData() {
-        return this.data;
+        return MediaPlayerService.albumList;
     }
 
     @Bindable
@@ -206,7 +204,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
             dataModel.setSongUrl(cursor.getString(3));
             dataModel.setTitle(cursor.getString(2));
 
-            data.add(dataModel);
+            MediaPlayerService.albumList.add(dataModel);
 
         }
         notifyPropertyChanged(BR.data);
@@ -289,7 +287,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
     @Override
     public void onCardSwiped(Direction direction) {
-        if (manager.getTopPosition() == data.size()) {
+        if (manager.getTopPosition() == MediaPlayerService.albumList.size()) {
             manager.smoothScrollToPosition(0);
         }
     }
@@ -318,10 +316,7 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
 
         if (view != null) {
             Intent intent = new Intent(view.getContext(), PlayMusicActivity.class);
-            intent.putExtra("position", position);
-            intent.putExtra("title", data.get(position).getTitle());
-            intent.putExtra("description", data.get(position).getDescription());
-            MediaPlayerService.albumList = data;
+            MediaPlayerService.positionToplay=position;
             view.getContext().startActivity(intent);
         }
 
@@ -342,9 +337,6 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
                 dataModels.add(dataModel);
             }
             Intent intent = new Intent(view.getContext(), PlayMusicActivity.class);
-            intent.putExtra("position", position);
-            intent.putExtra("title", dataModels.get(position).getTitle());
-            intent.putExtra("description", dataModels.get(position).getDescription());
             MediaPlayerService.albumList = dataModels;
 
             view.getContext().startActivity(intent);
@@ -357,11 +349,6 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
         }
         Intent resultIntent = new Intent(activity, PlayMusicActivity.class);
         resultIntent.putExtra("intent", true);
-        resultIntent.putExtra("position", MediaPlayerService.positionToplay);
-        resultIntent.putExtra("songLength", SingleSongIntentService.getInstance().songLength);
-        resultIntent.putExtra("songPlayed", SingleSongIntentService.getInstance().time);
-        resultIntent.putExtra("title", MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle());
-        resultIntent.putExtra("description", MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getDescription());
         activity.startActivity(resultIntent);
     }
 

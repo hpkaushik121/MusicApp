@@ -19,6 +19,11 @@ android {
     dataBinding {
         enabled = true
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    buildToolsVersion = '29.0.2'
 }
 
 dependencies {
@@ -36,6 +41,7 @@ dependencies {
     implementation 'com.android.support:cardview-v7:29.0.0'
     implementation 'com.android.support:design:29.0.0'
     implementation 'de.hdodenhof:circleimageview:3.0.1'
+    implementation "androidx.media:media:1.1.0"
     implementation 'jp.wasabeef:glide-transformations:4.0.0' // to blur the background according to image
     implementation 'androidx.palette:palette:1.0.0' //to get the palette color from image
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0' // compiler of glide to view image from URL

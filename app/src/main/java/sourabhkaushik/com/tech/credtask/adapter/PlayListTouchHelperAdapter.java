@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 
@@ -23,6 +24,8 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
     private final ItemTouchHelperContract mAdapter;
     private boolean start;
     private int degree=0;
+    private int fromPosition=-1;
+    private int toPosition=-1;
     public PlayListTouchHelperAdapter(ItemTouchHelperContract adapter) {
         mAdapter = adapter;
     }
@@ -115,6 +118,7 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
         }
     }
 
+
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
@@ -155,7 +159,10 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
     @Override
     public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
         super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
-        mAdapter.onRowMoved(fromPos,toPos);
+        fromPosition=fromPos;
+        toPosition=toPos;
+        mAdapter.onRowMoved(fromPosition,toPosition);
+
     }
 
     @Override
@@ -170,6 +177,8 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
         }
     }
 
+
+
     public interface ItemTouchHelperContract {
 
         void onRowMoved(int fromPosition, int toPosition);
@@ -179,6 +188,7 @@ public class PlayListTouchHelperAdapter extends ItemTouchHelper.Callback {
         void onRowClear(PlayListModalAdapter.GenericAdapter myViewHolder);
 
         void onItemDismiss(int position);
+
 
     }
 }

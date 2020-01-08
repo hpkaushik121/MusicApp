@@ -64,4 +64,5 @@
     <dimen name="dimen_210">210dp</dimen>
     <dimen name="dimen_60">60dp</dimen>
     <dimen name="round_corner_radius">50dp</dimen>
+    <dimen name="pager_margin">30dp</dimen>
 </resources>

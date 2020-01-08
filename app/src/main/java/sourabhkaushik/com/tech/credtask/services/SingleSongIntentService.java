@@ -25,7 +25,6 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
         MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
     private static SingleSongIntentService singleSongIntentService;
     private Runnable runnable;
-    private int positionPlaying;
     private Handler handler;
     private boolean isHandlerAttached = false;
     private MediaPlayer mediaPlayer;
@@ -56,10 +55,10 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
             @Override
             public void run() {
                 try {
-                    if(time<=songLength&&mediaPlayer.isPlaying()){
+                    if (time <= songLength && mediaPlayer.isPlaying()) {
                         time += 1000;
 
-                            MediaPlayerInterfaceInstance.getInstance().getMpinterface().songPlayed(mediaPlayer, time);
+                        MediaPlayerInterfaceInstance.getInstance().getMpinterface().songPlayed(mediaPlayer, time);
 
 
                     }
@@ -75,12 +74,20 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
     }
 
-    void playSong(int position, final String songUrl) {
+    void checkMedia() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.release();
+        }
+    }
+
+    void playSong(final String songUrl) {
         if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.release();
+            try {
+                checkMedia();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         if (handler != null
@@ -90,7 +97,6 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
             handler.removeCallbacks(runnable);
             isHandlerAttached = false;
         }
-        positionPlaying = position;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -101,7 +107,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                     mediaPlayer.setDataSource(songUrl); // setup song from https://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3 URL to mediaplayer data source
                     mediaPlayer.prepareAsync(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
 
-                        MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, true);
+                    MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, true);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -114,14 +120,14 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
 
     }
 
-    public void pauseMusic(){
-        if(mediaPlayer!=null&&mediaPlayer.isPlaying()){
+    public void pauseMusic() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             if (isHandlerAttached) {
                 handler.removeCallbacks(runnable);
                 isHandlerAttached = false;
             }
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().pauseMusic();
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().pauseMusic();
 
 
             mediaPlayer.pause();
@@ -144,14 +150,13 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
         }
     }
 
-    public void resumeMusic(boolean isAudioFocus){
-        if(mediaPlayer!=null&&!mediaPlayer.isPlaying()){
+    public void resumeMusic(boolean isAudioFocus) {
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             if (!isHandlerAttached) {
                 handler.post(runnable);
                 isHandlerAttached = true;
             }
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().resumeMusic();
-
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().resumeMusic();
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -164,7 +169,7 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                                 BitmapFactory.decodeResource(MainApplication.getAppContext().getResources(),
                                         R.drawable.pause_black)
                         ));
-            }else{
+            } else {
                 MediaPlayerService.mediaPlayerService.getNotificationOngoing(
                         time,
                         MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getTitle(),
@@ -174,9 +179,9 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
                                 R.drawable.pause_black)
                 );
             }
-            if(!isAudioFocus){
-               MediaPlayerService.mediaPlayerService.requestFocus();
-           }
+            if (!isAudioFocus) {
+                MediaPlayerService.mediaPlayerService.requestFocus();
+            }
             mediaPlayer.start();
         }
     }
@@ -184,16 +189,14 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     void setMusicToSec(int seekBarPerc) {
 
         if (mediaPlayer != null) {
-            if (isHandlerAttached
-
-            &&(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://"))) {
+            if (isHandlerAttached) {
                 handler.removeCallbacks(runnable);
                 isHandlerAttached = false;
             }
             time = (songLength / 100) * seekBarPerc;
             seekPostion = seekBarPerc;
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, true);
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, true);
 
             mediaPlayer.seekTo(time);
 
@@ -205,18 +208,17 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
         bufferedPercentage = i;
 
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface().bufferdPercentage(mediaPlayer,i);
+        MediaPlayerInterfaceInstance.getInstance().getMpinterface().bufferdPercentage(mediaPlayer, i);
 
         if (seekPostion != 0 && i > seekPostion && !isHandlerAttached) {
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
 
             handler.post(runnable);
             isHandlerAttached = true;
 
         }
     }
-
 
 
     @Override
@@ -227,11 +229,11 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
             isHandlerAttached = false;
             time = 1;
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().songCompleted(mediaPlayer, positionPlaying);
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().songCompleted(mediaPlayer, MediaPlayerService.positionToplay);
 
             if (!PlayMusicActivity.isInForground) {
-                positionPlaying += 1;
-                MediaPlayerService.mediaPlayerService.playSongAtPosition(positionPlaying);
+                MediaPlayerService.positionToplay += 1;
+                MediaPlayerService.mediaPlayerService.playSongAtPosition(MediaPlayerService.positionToplay);
             }
         } else {
             isCompletionOnError = false;
@@ -245,8 +247,8 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
         MediaPlayerService.mediaPlayerService.requestFocus();
         songLength = mediaPlayer.getDuration();
 
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface().songLength(mediaPlayer, songLength);
-            MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
+        MediaPlayerInterfaceInstance.getInstance().getMpinterface().songLength(mediaPlayer, songLength);
+        MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
 
         if (!isHandlerAttached) {
             handler.post(runnable);
@@ -281,13 +283,12 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     public boolean onInfo(MediaPlayer mediaPlayer, int what, int extra) {
         switch (what) {
             case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                if (isHandlerAttached
-                &&(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://")||MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://"))) {
+                if (isHandlerAttached) {
                     handler.removeCallbacks(runnable);
                     isHandlerAttached = false;
                 }
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer,true);
+                MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, true);
                 break;
             case MediaPlayer.MEDIA_INFO_BUFFERING_END:
                 if (!isHandlerAttached) {
@@ -311,9 +312,9 @@ public class SingleSongIntentService implements MediaPlayer.OnBufferingUpdateLis
     public void onSeekComplete(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
         MediaPlayerService.mediaPlayerService.requestFocus();
-        if (seekPostion != 0 && bufferedPercentage > seekPostion && !isHandlerAttached) {
+        if (seekPostion != 0 && (bufferedPercentage > seekPostion || (!MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("http://") && !MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage().contains("https://"))&& !isHandlerAttached) ){
 
-                MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
+            MediaPlayerInterfaceInstance.getInstance().getMpinterface().buffering(mediaPlayer, false);
 
             handler.post(runnable);
             isHandlerAttached = true;

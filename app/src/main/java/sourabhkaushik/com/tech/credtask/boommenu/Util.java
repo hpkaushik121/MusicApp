@@ -39,6 +39,11 @@ import sourabhkaushik.com.tech.credtask.R;
 
 public class Util {
 
+    public static final int blurIndex=5;
+    public static final int sampling=4;
+    public static final int ADAPTER_TYPE_TOP = 1;
+    public static final int ADAPTER_TYPE_BOTTOM = 2;
+
     static Activity scanForActivity(Context context) {
         if (context == null) {
             Log.w(BoomMenuButton.TAG, "scanForActivity: context is null!");

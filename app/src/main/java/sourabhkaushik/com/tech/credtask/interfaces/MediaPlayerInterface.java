@@ -19,5 +19,5 @@ public interface MediaPlayerInterface {
     void songLength(MediaPlayer mediaPlayer,int songLength);
     void songCompleted(MediaPlayer mediaPlayer,int position);
     void songPlayed(MediaPlayer mediaPlayer,int seconds);
-    void onPositionChange(List<DataModel> list,int position);
+    void onPositionChange(List<DataModel> list);
 }

@@ -20,7 +20,6 @@
     android:layout_height="wrap_content">
     <ImageView
         android:layout_width="@dimen/dimen_50"
-        android:src="@drawable/dummy"
         android:layout_margin="@dimen/dimen_5"
        android:id="@+id/songConver"
         android:layout_height="@dimen/dimen_50" />
