@@ -115,13 +115,19 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
         }else {
 
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            byte[] rawArt;
+            byte[] rawArt=null;
             Bitmap art;
             BitmapFactory.Options bfo=new BitmapFactory.Options();
-            Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
-            mmr.setDataSource(MainApplication.getAppContext(), uri);
-            rawArt = mmr.getEmbeddedPicture();
-            if (null != rawArt){
+            try{
+
+                Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+                mmr.setDataSource(MainApplication.getAppContext(), uri);
+                rawArt = mmr.getEmbeddedPicture();
+            }catch (Exception e){
+
+            }
+
+            if (rawArt !=null ){
                 art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
                 Glide.with(MainApplication.getAppContext())
                         .load(art)
@@ -292,21 +298,26 @@ public class PlayListViewModel extends BaseObservable implements ListPlayingInte
                     MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                     byte[] rawArt;
                     Bitmap art;
-                    BitmapFactory.Options bfo=new BitmapFactory.Options();
-                    Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
-                    mmr.setDataSource(MainApplication.getAppContext(), uri);
-                    rawArt = mmr.getEmbeddedPicture();
-                    if (null != rawArt){
-                        art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-                        Glide.with(MainApplication.getAppContext())
-                                .load(art)
-                                .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
-                                .into(playListLayoutBinding.plBgImage);
+                    try{ BitmapFactory.Options bfo=new BitmapFactory.Options();
+                        Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+                        mmr.setDataSource(MainApplication.getAppContext(), uri);
+                        rawArt = mmr.getEmbeddedPicture();
+                        if (null != rawArt){
+                            art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                            Glide.with(MainApplication.getAppContext())
+                                    .load(art)
+                                    .apply(bitmapTransform(new BlurTransformation(Util.blurIndex,  Util.sampling)))
+                                    .into(playListLayoutBinding.plBgImage);
 
-                        Glide.with(MainApplication.getAppContext())
-                                .load(art)
-                                .into(playListLayoutBinding.toolbarImage);
+                            Glide.with(MainApplication.getAppContext())
+                                    .load(art)
+                                    .into(playListLayoutBinding.toolbarImage);
+                        }
+
+                    }catch (Exception e){
+
                     }
+
 
                 }
 

@@ -117,15 +117,21 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             byte[] rawArt;
             Bitmap art=null;
-            BitmapFactory.Options bfo=new BitmapFactory.Options();
-            Uri uri= Uri.fromFile(new File((String) objects[0]));
-            viewHolder= (DataViewHolder) objects[1];
-            mmr.setDataSource(context, uri);
-            rawArt = mmr.getEmbeddedPicture();
-            if (null != rawArt){
-                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+            try{
+                BitmapFactory.Options bfo=new BitmapFactory.Options();
+                Uri uri= Uri.fromFile(new File((String) objects[0]));
+                viewHolder= (DataViewHolder) objects[1];
+                mmr.setDataSource(context, uri);
+                rawArt = mmr.getEmbeddedPicture();
+                if (null != rawArt){
+                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+
+                }
+            }catch (Exception e){
 
             }
+
+
             return art;
         }
 

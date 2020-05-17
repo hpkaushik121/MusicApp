@@ -23,6 +23,7 @@ package sourabhkaushik.com.tech.credtask.view;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -30,6 +31,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,6 +45,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,16 +72,35 @@ public class MainActivity extends AppCompatActivity implements RequestListener {
     private DataViewModel dataViewModel;
     public static boolean isInForground = false;
     private ActivityMainBinding binding;
-    Parcelable state;
+    private static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 21;
     private Handler mUiHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestPermission();
-
+        checkPermissions();
         bind();
 
+
+    }
+    private void checkPermissions() {
+        TedPermission.with(this)
+                .setPermissionListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted() {
+
+                    }
+
+                    @Override
+                    public void onPermissionDenied(List<String> deniedPermissions) {
+                        checkPermissions();
+                    }
+                })
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                .check();
     }
 
     @Override
@@ -84,22 +108,16 @@ public class MainActivity extends AppCompatActivity implements RequestListener {
             permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
-            case REQUEST_WRITE_PERMISSION:
-                if (grantResults.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    // check whether storage permission granted or not.
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        //do what you want;
-                        bind();
-                    }else {
-                        System.exit(1);
-                    }
-                }else {
-                    bind();
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    System.exit(1);
+                } else {
+                    //Permission Granted-System will work
+                    checkPermissions();
                 }
-                break;
-            default:
-                break;
+
+            }
         }
     }
 

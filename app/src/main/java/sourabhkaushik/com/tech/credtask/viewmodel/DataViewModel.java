@@ -376,14 +376,19 @@ public class DataViewModel extends BaseObservable implements CardStackListener {
                         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                         byte[] rawArt;
                         Bitmap art;
-                        BitmapFactory.Options bfo=new BitmapFactory.Options();
-                        Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
-                        mmr.setDataSource(activity, uri);
-                        rawArt = mmr.getEmbeddedPicture();
-                        if (null != rawArt){
-                            art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-                            Glide.with(activity).load(art).into(imageView);
+                        try{
+                            BitmapFactory.Options bfo=new BitmapFactory.Options();
+                            Uri uri= Uri.fromFile(new File(MediaPlayerService.albumList.get(MediaPlayerService.positionToplay).getImage()));
+                            mmr.setDataSource(activity, uri);
+                            rawArt = mmr.getEmbeddedPicture();
+                            if (null != rawArt){
+                                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                                Glide.with(activity).load(art).into(imageView);
+                            }
+                        }catch (Exception e){
+
                         }
+
 
                     }currentSongPosition = pos;
                 }

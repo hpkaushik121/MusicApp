@@ -397,6 +397,7 @@ public class MediaPlayerService extends Service implements AudioManager.OnAudioF
                 MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                 byte[] rawArt;
                 Bitmap art;
+
                 BitmapFactory.Options bfo=new BitmapFactory.Options();
                 Uri uri= Uri.fromFile(new File(image));
                 mmr.setDataSource(getApplicationContext(), uri);

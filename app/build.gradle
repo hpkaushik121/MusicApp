@@ -45,5 +45,6 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:4.0.0' // to blur the background according to image
     implementation 'androidx.palette:palette:1.0.0' //to get the palette color from image
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0' // compiler of glide to view image from URL
+    implementation 'gun0912.ted:tedpermission:2.2.2'
 
 }

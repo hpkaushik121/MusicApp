@@ -87,17 +87,23 @@ public class PlayListAdapter extends PagerAdapter {
         if (dataModel.getImage().contains("http://") || dataModel.getImage().contains("https://")) {
             Glide.with(context).load(dataModel.getImage()).apply(requestOptions).into(binding.coverImage);
         } else {
+
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             byte[] rawArt;
             Bitmap art = null;
-            BitmapFactory.Options bfo = new BitmapFactory.Options();
-            Uri uri = Uri.fromFile(new File(dataModel.getImage()));
-            mmr.setDataSource(context, uri);
-            rawArt = mmr.getEmbeddedPicture();
-            if (null != rawArt) {
-                art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+            try{
+                BitmapFactory.Options bfo = new BitmapFactory.Options();
+                Uri uri = Uri.fromFile(new File(dataModel.getImage()));
+                mmr.setDataSource(context, uri);
+                rawArt = mmr.getEmbeddedPicture();
+                if (null != rawArt) {
+                    art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+
+                }
+            }catch (Exception e){
 
             }
+
             Glide.with(context).load(art).apply(requestOptions).into(binding.coverImage);
         }
         View view = binding.getRoot();
